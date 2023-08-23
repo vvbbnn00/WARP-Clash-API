@@ -3,6 +3,7 @@ import os
 import sys
 
 from config import PORT, HOST
+from utils.logger import create_logger
 
 
 def linux_start_web():
@@ -28,7 +29,6 @@ def linux_start_web():
     FlaskGunicornApp(app, options={
         "bind": f"{HOST}:{PORT}",
         "workers": 4,
-        "worker_class": "gevent",
         "worker_connections": 1000,
         "timeout": 30,
         "keepalive": 2
@@ -42,8 +42,9 @@ def main():
     args = parser.parse_args()
 
     if args.command == "web":
+        logger = create_logger("app_web")
         from services.web_service import create_app
-        app = create_app("web")
+        app = create_app("web", logger=logger)
 
         # If windows, use app.run()
         if sys.platform == "win32":
@@ -53,8 +54,10 @@ def main():
             linux_start_web()
 
     elif args.command == "background":
+        logger = create_logger("app_background")
         from services.scheduled_service import main
-        main()
+        main(logger=logger)
+
     elif args.command == "optimize":
         # Run ./scripts/get_entrypoint.sh
         os.system("bash ./scripts/get_entrypoint.sh")

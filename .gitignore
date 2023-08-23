@@ -4,3 +4,4 @@ venv
 .idea
 
 *.local
+logs/*.log

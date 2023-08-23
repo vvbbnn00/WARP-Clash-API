@@ -22,7 +22,7 @@ endpointyx(){
     # 启动 WARP Endpoint IP 优选工具
     chmod +x warp && ./warp >/dev/null 2>&1
 
-    cat result.csv | awk -F, '$3!="timeout ms" {print} ' | sort -t, -nk2 -nk3 | uniq | head -11 | awk -F, '{print "端点 "$1" 丢包率 "$2" 平均延迟 "$3}'
+    cat /app/config/result.csv | awk -F, '$3!="timeout ms" {print} ' | sort -t, -nk2 -nk3 | uniq | head -11 | awk -F, '{print "端点 "$1" 丢包率 "$2" 平均延迟 "$3}'
 
     # 删除 WARP Endpoint IP 优选工具及其附属文件
     rm -f warp ip.txt

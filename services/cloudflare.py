@@ -19,9 +19,10 @@ SESSION.headers.update(DEFAULT_HEADERS)
 fake = faker.Faker()
 
 
-def gen_account_from_response(response, referrer=None) -> Account:
+def gen_account_from_response(response, referrer=None, private_key=None) -> Account:
     """
     Generate an account from a response
+    :param private_key:
     :param response:
     :param referrer:
     :return:
@@ -31,7 +32,7 @@ def gen_account_from_response(response, referrer=None) -> Account:
     account.account_id = response["id"]
     account.account_type = response["account"]["account_type"]
     account.token = response["token"]
-    account.private_key = response["key"]
+    account.private_key = private_key
     account.license_key = response["account"]["license"]
     account.created_at = response["account"]["created"]
     account.updated_at = response["account"]["updated"]
@@ -72,7 +73,7 @@ def register(public_key, device_model=f"{fake.company()} {fake.country()}", refe
     response = SESSION.post(f"{API_URL}/{API_VERSION}/reg", json=data, proxies=proxy)
     response.raise_for_status()
 
-    return gen_account_from_response(response.json())
+    return gen_account_from_response(response.json(), private_key=public_key, referrer=referrer)
 
 
 def get_account(account: Account, proxy=None) -> dict:
@@ -89,7 +90,6 @@ def get_account(account: Account, proxy=None) -> dict:
                            proxies=proxy)
     response.raise_for_status()
     data = response.json()
-    account.private_key = data["key"]
     account.license_key = data["account"].get("license")
     account.premium_data = data["account"].get("premium_data")
     account.quota = data["account"].get("quota")

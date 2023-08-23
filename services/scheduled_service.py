@@ -3,12 +3,12 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from services.tasks import doAddDataTaskOnce, saveAccount
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
-scheduler = BackgroundScheduler()
 
-
-def main():
+def main(logger=None):
+    if logger is None:
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger()
+    scheduler = BackgroundScheduler()
     logger.info(f"Start scheduler")
     scheduler.add_job(doAddDataTaskOnce, 'interval', seconds=18, args=[None, logger])
     scheduler.add_job(saveAccount, 'interval', seconds=120, args=[None, logger])

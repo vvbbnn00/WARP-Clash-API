@@ -12,5 +12,6 @@ services:
     env_file:
       - .env.local
     volumes:
-      - ./config:/app/config:ro
+      - ./config:/app/config
+      - ./account.json:/app/account.json
       - ./logs:/app/logs
