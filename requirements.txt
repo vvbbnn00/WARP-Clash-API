@@ -1,0 +1,8 @@
+requests~=2.31.0
+cryptography~=41.0.3
+Faker~=19.3.0
+flask~=2.3.3
+PyYAML~=6.0.1
+APScheduler~=3.10.4
+gunicorn==21.2.0
+
