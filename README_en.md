@@ -9,7 +9,7 @@
 ## 🤔 What is This?
 
 This project allows you to use `WARP+` through a subscription, supporting clients
-like `Clash`, `Surge`, `Quantumult`, `Shadowrocket`, etc. The project includes a feature to replenish `WARP+` traffic,
+like `Clash`, `Shadowrocket`, etc. The project includes a feature to replenish `WARP+` traffic,
 enabling your `WARP+` traffic to be unrestricted (1GB of traffic every 18 seconds). Additionally, it comes with IP
 optimization. It supports one-click deployment through `Docker compose`, so you can enjoy your private
 high-speed `WARP+` node without extra hassle!

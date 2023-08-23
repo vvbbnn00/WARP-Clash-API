@@ -8,7 +8,7 @@
 
 ## 🤔 这是什么？
 
-该项目可以让你通过订阅的方式使用`WARP+`，支持`Clash`、`Surge`、`Quantumult`、`Shadowrocket`等客户端。项目内置了刷取`WARP+`
+该项目可以让你通过订阅的方式使用`WARP+`，支持`Clash`、`Shadowrocket`等客户端。项目内置了刷取`WARP+`
 流量的功能，可以让你的`WARP+`流量不再受限制（每`18`秒可获得`1GB`流量），同时，配备了`IP`选优功能。支持`Docker compose`
 一键部署，无需额外操作，即可享受你自己的`WARP+`私有高速节点！
 
