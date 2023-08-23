@@ -4,8 +4,7 @@
 
 > **Warning**
 >
-> This project is for educational and communication purposes only. Do not use it for illegal activities; otherwise, you
-> will be solely responsible for the consequences.
+> This project is entirely non-commercial and is intended solely for educational and communicative purposes. Please do not use it for illegal activities, as the consequences will be borne by the user.
 
 ## 🤔 What is This?
 
