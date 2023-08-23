@@ -1,0 +1,124 @@
+import datetime
+import requests
+import faker
+from models import Account
+
+API_URL = "https://api.cloudflareclient.com"
+API_VERSION = "v0a1922"
+DEFAULT_HEADERS = {
+    "User-Agent": "okhttp/3.12.1",
+    "CF-Client-Version": "a-6.3-1922",
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Host': 'api.cloudflareclient.com',
+    'Connection': 'Keep-Alive',
+    'Accept-Encoding': 'gzip',
+}
+
+SESSION = requests.Session()
+SESSION.headers.update(DEFAULT_HEADERS)
+fake = faker.Faker()
+
+
+def gen_account_from_response(response, referrer=None) -> Account:
+    """
+    Generate an account from a response
+    :param response:
+    :param referrer:
+    :return:
+    """
+    account = Account()
+    account.model = response["model"]
+    account.account_id = response["id"]
+    account.account_type = response["account"]["account_type"]
+    account.token = response["token"]
+    account.private_key = response["key"]
+    account.license_key = response["account"]["license"]
+    account.created_at = response["account"]["created"]
+    account.updated_at = response["account"]["updated"]
+    account.premium_data = response["account"]["premium_data"]
+    account.quota = response["account"]["quota"]
+    account.usage = response["account"]["usage"]
+    account.referrer = referrer
+
+    return account
+
+
+def register(public_key, device_model=f"{fake.company()} {fake.country()}", referrer="", proxy=None) -> Account:
+    """
+    Register a new device
+
+    :param proxy: proxy dict
+    :param referrer: referrer ID, optional
+    :param public_key: base64 encoded public key
+    :param device_model: device model
+    :return:
+    """
+    timestamp = datetime.datetime.now().isoformat()[:-3] + "+02:00"
+    # install_id is 43 characters long
+    install_id = fake.pystr(min_chars=43, max_chars=43)
+    data = {
+        # 152 characters in total
+        "fcm_token": "{}:APA91b{}".format(install_id, fake.pystr(min_chars=134, max_chars=134)),
+        "install_id": install_id,
+        "key": public_key,
+        "warp_enabled": True,
+        "locale": "en_US",
+        "model": device_model,
+        "tos": timestamp,
+        "type": fake.random_element(elements=("Android", "iOS")),
+    }
+    if referrer:
+        data["referrer"] = referrer
+    response = SESSION.post(f"{API_URL}/{API_VERSION}/reg", json=data, proxies=proxy)
+    response.raise_for_status()
+
+    return gen_account_from_response(response.json())
+
+
+def get_account(account: Account, proxy=None) -> dict:
+    """
+    Get account details and update the account object
+
+    :param account: account
+    :param proxy: proxy dict
+    :return:
+    """
+
+    response = SESSION.get(f"{API_URL}/{API_VERSION}/reg/{account.account_id}",
+                           headers={"Authorization": f"Bearer {account.token}"},
+                           proxies=proxy)
+    response.raise_for_status()
+    data = response.json()
+    account.private_key = data["key"]
+    account.license_key = data["account"].get("license")
+    account.premium_data = data["account"].get("premium_data")
+    account.quota = data["account"].get("quota")
+    account.usage = data["account"].get("usage")
+    account.updated_at = data["account"].get("updated")
+
+    return data["account"]
+
+
+def get_client_config(proxy=None) -> dict:
+    """
+    Get client config
+
+    :param account: account
+    :param proxy: proxy dict
+    :return:
+    """
+
+    response = SESSION.get(f"{API_URL}/{API_VERSION}/client_config",
+                           proxies=proxy)
+    response.raise_for_status()
+
+    return response.json()
+
+
+if __name__ == '__main__':
+    import utils.wireguard as wg
+    print(get_client_config())
+    reg = register(wg.generate_wireguard_keys()[0])
+    print(reg)
+    detail = get_account(reg)
+    print(detail)
