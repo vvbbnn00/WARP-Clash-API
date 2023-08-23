@@ -44,10 +44,12 @@ def gen_account_from_response(response, referrer=None, private_key=None) -> Acco
     return account
 
 
-def register(public_key, device_model=f"{fake.company()} {fake.country()}", referrer="", proxy=None) -> Account:
+def register(public_key, private_key, device_model=f"{fake.company()} {fake.country()}", referrer="",
+             proxy=None) -> Account:
     """
     Register a new device
 
+    :param private_key: base64 encoded private key
     :param proxy: proxy dict
     :param referrer: referrer ID, optional
     :param public_key: base64 encoded public key
@@ -73,7 +75,7 @@ def register(public_key, device_model=f"{fake.company()} {fake.country()}", refe
     response = SESSION.post(f"{API_URL}/{API_VERSION}/reg", json=data, proxies=proxy)
     response.raise_for_status()
 
-    return gen_account_from_response(response.json(), private_key=public_key, referrer=referrer)
+    return gen_account_from_response(response.json(), private_key=private_key, referrer=referrer)
 
 
 def get_account(account: Account, proxy=None) -> dict:
@@ -113,12 +115,3 @@ def get_client_config(proxy=None) -> dict:
     response.raise_for_status()
 
     return response.json()
-
-
-if __name__ == '__main__':
-    import utils.wireguard as wg
-    print(get_client_config())
-    reg = register(wg.generate_wireguard_keys()[0])
-    print(reg)
-    detail = get_account(reg)
-    print(detail)

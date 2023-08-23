@@ -24,8 +24,8 @@ def doAddDataTaskOnce(account: Account = None, logger=logging.Logger(__name__)) 
     start = time.time()
 
     try:
-        privkey, _ = generate_wireguard_keys()
-        register(privkey, referrer=account.account_id, proxy=getProxy())
+        privkey, pubkey = generate_wireguard_keys()
+        register(pubkey, privkey, referrer=account.account_id, proxy=getProxy())
     except Exception as e:
         logger.warning(f"Failed to get account from Cloudflare.")
         logger.warning(f"{e}")
@@ -55,3 +55,12 @@ def saveAccount(account: Account = None, logger=logging.Logger(__name__)):
     logger.info(f"Account info: {info}")
     logger.info(f"Save account to file")
     account.save()
+
+
+# if __name__ == '__main__':
+#     privkey, pubkey = generate_wireguard_keys()
+#     account = register(pubkey, privkey, proxy=getProxy())
+#     print(account)
+#     privkey, pubkey = generate_wireguard_keys()
+#     new_account = register(pubkey, privkey, proxy=getProxy(), referrer=account.account_id)
+#     print(new_account)
