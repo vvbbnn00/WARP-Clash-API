@@ -13,5 +13,5 @@ services:
       - .env.local
     volumes:
       - ./config:/app/config
-      - ./account.json:/app/account.json
+      - ./account:/app/account
       - ./logs:/app/logs

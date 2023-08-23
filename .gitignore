@@ -1,4 +1,4 @@
-account.json
+account/account.json
 venv
 .DS_Store
 .idea

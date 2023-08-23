@@ -1,6 +1,8 @@
 import datetime
 import json
 
+ACCOUNT_PATH = "account/account.json"
+
 
 class Account:
     account_id: str = ""
@@ -30,12 +32,12 @@ class Account:
                f"Quota: {self.quota}\n" \
                f"Used: {self.usage}\n"
 
-    def save(self, file="account.json"):
+    def save(self, file=ACCOUNT_PATH):
         with open(file, "w") as f:
             json.dump(self.__dict__, f)
 
     @staticmethod
-    def load(file="account.json"):
+    def load(file=ACCOUNT_PATH):
         try:
             with open(file, "r") as f:
                 data = json.load(f)
