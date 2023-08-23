@@ -1,14 +1,9 @@
 version: "3.8"
 services:
-  web:
+  warp-clash:
     build: .
     ports:
       - "21001:3000"
-    environment:
-      - REQUEST_RATE_LIMIT=5
-      - RANDOM_COUNT=10
-      - LOSS_THRESHOLD=10
-      - DELAY_THRESHOLD=500
     env_file:
       - .env.local
     volumes:

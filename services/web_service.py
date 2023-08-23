@@ -1,7 +1,7 @@
 import time
 from functools import wraps
 
-from flask import Flask, request, make_response, current_app
+from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
 from services.subscription import generate_WARP_subFile
 from services.common import *
@@ -21,7 +21,7 @@ def authorized():
 
             key = request.headers.get('X-Api-Key') or request.args.get('key')
 
-            if key == SECRET_KEY:
+            if key == SECRET_KEY or not SECRET_KEY:
                 return f(*args, **kwargs)
             else:
                 return {
@@ -72,6 +72,10 @@ def rate_limit(limit: int = REQUEST_RATE_LIMIT):
 def attach_endpoints(app: Flask):
     logger = app.logger
     logger.setLevel(logging.INFO)
+
+    @app.route('/')
+    def http_index():
+        return render_template('index.html')
 
     @app.route('/api/account', methods=['GET'])
     @rate_limit()

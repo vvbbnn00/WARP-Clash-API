@@ -11,9 +11,9 @@ def linux_start_web():
     from services.web_service import create_app
 
     class FlaskGunicornApp(BaseApplication):
-        def __init__(self, app, options=None):
+        def __init__(self, flaskapp, options=None):
             self.options = options or {}
-            self.application = app
+            self.application = flaskapp
             super().__init__()
 
         def load_config(self):
@@ -60,7 +60,7 @@ def main():
 
     elif args.command == "optimize":
         # Run ./scripts/get_entrypoint.sh
-        os.system("bash ./scripts/get_entrypoint.sh")
+        os.system("bash ./scripts/get_entrypoints.sh")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WARP Clash 订阅地址生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            color: #333;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #passwordInput {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        #subscriptionLink {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #qrcode {
+            max-width: 200px;
+        }
+
+        footer {
+            margin-top: 50px;
+            line-height: 0.5;
+        }
+
+        a {
+            color: #1e88e5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .warning {
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff9c4;
+            color: #807d62;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 0 auto 20px;
+        }
+
+        textarea {
+            resize: none;
+            border: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        textarea:focus {
+            outline: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: rgba(110, 255, 114, 0.8);
+            color: #4caf50;
+            border-radius: 4px;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        .show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div class="warning" style="display: none" id="ip-warn">
+    <p>您的域名看起来似乎是本地域名，这意味着您的订阅地址<b>无法</b>被局域网及公网访问。</p>
+</div>
+
+<h1>WARP Clash 订阅地址生成器</h1>
+<label for="passwordInput"></label>
+<input type="password" id="passwordInput" placeholder="输入您的SECRET_KEY" oninput="generateLink()">
+<center>
+    <textarea id="subscriptionLink" rows="1" readonly onclick="copyText()"></textarea>
+    <div id="qrcode"></div>
+</center>
+
+<footer>
+    <p>Powered by <a href="https://github.com/vvbbnn00/WARP-Clash-API">WARP Clash API</a></p>
+    <p>Made with ❤️ by <a href="https://github.com/vvbbnn00">vvbbnn00</a></p>
+</footer>
+
+<script>
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '0.0.0.0') {
+        document.getElementById('ip-warn').style.display = 'block';
+    }
+
+    function generateLink() {
+        const password = document.getElementById('passwordInput').value;
+        const baseUrl = location.protocol + '//' + location.host + '/api/clash';
+        const queryParams = new URLSearchParams({
+            key: password
+        });
+        const fullUrl = baseUrl + "?" + queryParams.toString();
+        document.getElementById('subscriptionLink').textContent = password.length ? fullUrl : baseUrl;
+
+        const qrcodeContainer = document.getElementById('qrcode');
+        qrcodeContainer.innerHTML = '';
+        const qrcode = new QRCode(qrcodeContainer, {
+            text: fullUrl,
+            width: 200,
+            height: 200
+        });
+    }
+
+    function copyText() {
+        const textarea = document.getElementById('subscriptionLink');
+        textarea.select();
+        document.execCommand('copy');
+        showToast("已复制到剪贴板");
+    }
+
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 1000);
+    }
+
+    generateLink()
+</script>
+
+</body>
+</html>
