@@ -44,6 +44,20 @@ def get_entrypoints():
     return ENTRYPOINTS
 
 
+def get_best_entrypoints(num=1):
+    """
+    Get best entrypoints
+    :param num:
+    :return:
+    """
+    if not ENTRYPOINTS:
+        reload_entrypoints()
+
+    # sort by loss and delay
+    returnEntryPoints = sorted(ENTRYPOINTS, key=lambda x: (x.loss, x.delay))[:num]
+    return returnEntryPoints
+
+
 if __name__ == '__main__':
     reload_entrypoints()
     print(ENTRYPOINTS)

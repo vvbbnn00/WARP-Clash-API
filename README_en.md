@@ -4,7 +4,8 @@
 
 > **Warning**
 >
-> This project is entirely non-commercial and is intended solely for educational and communicative purposes. Please do not use it for illegal activities, as the consequences will be borne by the user.
+> This project is entirely non-commercial and is intended solely for educational and communicative purposes. Please do
+> not use it for illegal activities, as the consequences will be borne by the user.
 
 ## 🤔 What is This?
 
@@ -87,6 +88,7 @@ Here are the available environment variables:
 | Variable Name      | Default | Description                                                                                                  |
 |--------------------|---------|--------------------------------------------------------------------------------------------------------------|
 | SECRET_KEY         | None    | Used to protect the subscription link. If not configured, no `SECRET_KEY` input is required to get the link. |
+| DO_GET_WARP_DATA   | True    | Whether to get `WARP+` data. If set to `False`, the `WARP+` data will not be obtained.                       |
 | REQUEST_RATE_LIMIT | 0       | Limits requests to once every X seconds. This feature is unstable; it's recommended not to enable it.        |
 | RANDOM_COUNT       | 10      | Number of randomly selected nodes during each subscription update.                                           |
 | LOSS_THRESHOLD     | 10      | Packet loss threshold; IPs exceeding this threshold will be removed.                                         |

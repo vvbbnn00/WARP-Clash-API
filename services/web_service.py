@@ -3,8 +3,9 @@ from functools import wraps
 
 from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
-from services.subscription import generate_WARP_subFile
+from services.subscription import generate_Clash_subFile, generate_Wireguard_subFile
 from services.common import *
+from faker import Faker
 
 RATE_LIMIT_MAP = {}
 
@@ -72,6 +73,7 @@ def rate_limit(limit: int = REQUEST_RATE_LIMIT):
 def attach_endpoints(app: Flask):
     logger = app.logger
     logger.setLevel(logging.INFO)
+    fake = Faker()
 
     @app.route('/')
     def http_index():
@@ -93,12 +95,31 @@ def attach_endpoints(app: Flask):
     @authorized()
     def http_clash():
         account = getCurrentAccount(logger)
-        fileData = generate_WARP_subFile(account, logger)
+        best = request.args.get('best') or False
+        fileData = generate_Clash_subFile(account, logger, best=best)
 
         headers = {
             'Content-Type': 'application/x-yaml; charset=utf-8',
-            'Content-Disposition': f'attachment; filename=Clash.yaml',
+            'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
             "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
+        }
+
+        response = make_response(fileData)
+        response.headers = headers
+
+        return response
+
+    @app.route('/api/wireguard', methods=['GET'])
+    @rate_limit()
+    @authorized()
+    def http_wireguard():
+        account = getCurrentAccount(logger)
+        best = request.args.get('best') or False
+        fileData = generate_Wireguard_subFile(account, logger, best=best)
+
+        headers = {
+            'Content-Type': 'application/x-conf; charset=utf-8',
+            'Content-Disposition': f'attachment; filename=Wireguard-{fake.color_name()}.conf'
         }
 
         response = make_response(fileData)
@@ -121,3 +142,8 @@ def create_app(app_name: str = "web", logger: logging.Logger = None) -> Flask:
 
     attach_endpoints(app)
     return app
+
+
+if __name__ == '__main__':
+    runApp = create_app()
+    runApp.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,6 +1,8 @@
 import time
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from config import DO_GET_WARP_DATA
 from services.tasks import doAddDataTaskOnce, saveAccount
 
 
@@ -10,7 +12,8 @@ def main(logger=None):
         logger = logging.getLogger()
     scheduler = BackgroundScheduler()
     logger.info(f"Start scheduler")
-    scheduler.add_job(doAddDataTaskOnce, 'interval', seconds=18, args=[None, logger])
+    if DO_GET_WARP_DATA:
+        scheduler.add_job(doAddDataTaskOnce, 'interval', seconds=18, args=[None, logger])
     scheduler.add_job(saveAccount, 'interval', seconds=120, args=[None, logger])
     scheduler.start()
 

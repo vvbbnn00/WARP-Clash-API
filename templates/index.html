@@ -25,11 +25,6 @@
             margin-bottom: 20px;
         }
 
-        #subscriptionLink {
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
         #qrcode {
             max-width: 200px;
         }
@@ -64,6 +59,8 @@
             border: none;
             text-align: center;
             width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
 
         textarea:focus {
@@ -98,11 +95,25 @@
 </div>
 
 <h1>WARP Clash 订阅地址生成器</h1>
-<label for="passwordInput"></label>
-<input type="password" id="passwordInput" placeholder="输入您的SECRET_KEY" oninput="generateLink()">
+<form>
+    <div>
+        <label for="passwordInput"></label>
+        <input type="password" id="passwordInput" placeholder="输入您的SECRET_KEY" oninput="generateLink()">
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" id="alwaysBest" onchange="generateLink()"> 始终选择最优节点
+        </label>
+    </div>
+</form>
 <center>
-    <textarea id="subscriptionLink" rows="1" readonly onclick="copyText()"></textarea>
+    <h2>Clash</h2>
+    <textarea id="subscriptionLink" rows="1" readonly onclick="copyText('subscriptionLink')"></textarea>
     <div id="qrcode"></div>
+    <h2>Wireguard</h2>
+    <textarea id="WireguardLink" rows="1" readonly onclick="copyText('WireguardLink')"></textarea>
+    <h2>账户信息</h2>
+    <a href="#" title="账户信息" target="_blank" id="AccountLink">点击查看</a>
 </center>
 
 <footer>
@@ -116,24 +127,31 @@
 
     function generateLink() {
         const password = document.getElementById('passwordInput').value;
-        const baseUrl = location.protocol + '//' + location.host + '/api/clash';
+        const best = document.getElementById('alwaysBest').checked;
+        const baseUrl = location.protocol + '//' + location.host + '/api/';
         const queryParams = new URLSearchParams({
-            key: password
+            best
         });
-        const fullUrl = baseUrl + "?" + queryParams.toString();
-        document.getElementById('subscriptionLink').textContent = password.length ? fullUrl : baseUrl;
+
+        if (password.length) {
+            queryParams.append('secret_key', password);
+        }
+
+        document.getElementById('subscriptionLink').textContent = baseUrl + "clash?" + queryParams.toString();
+        document.getElementById('WireguardLink').textContent = baseUrl + "wireguard?" + queryParams.toString();
+        document.getElementById('AccountLink').href = baseUrl + "account?" + queryParams.toString();
 
         const qrcodeContainer = document.getElementById('qrcode');
         qrcodeContainer.innerHTML = '';
         const qrcode = new QRCode(qrcodeContainer, {
-            text: fullUrl,
+            text: document.getElementById('subscriptionLink').textContent,
             width: 200,
             height: 200
         });
     }
 
-    function copyText() {
-        const textarea = document.getElementById('subscriptionLink');
+    function copyText(elem) {
+        const textarea = document.getElementById(elem);
         textarea.select();
         document.execCommand('copy');
         showToast("已复制到剪贴板");
