@@ -134,7 +134,7 @@
         });
 
         if (password.length) {
-            queryParams.append('secret_key', password);
+            queryParams.append('key', password);
         }
 
         document.getElementById('subscriptionLink').textContent = baseUrl + "clash?" + queryParams.toString();
