@@ -112,6 +112,9 @@
     <div id="qrcode"></div>
     <h2>Wireguard</h2>
     <textarea id="WireguardLink" rows="1" readonly onclick="copyText('WireguardLink')"></textarea>
+    <h2>Only Proxies & Proxies Group</h2>
+    <textarea id="proxy_info" rows="0"></textarea>
+    <span readonly onclick="copyText('proxy_info')">点击复制节点信息</span>
     <h2>账户信息</h2>
     <a href="#" title="账户信息" target="_blank" id="AccountLink">点击查看</a>
 </center>
@@ -148,6 +151,8 @@
             width: 200,
             height: 200
         });
+        const url = baseUrl + "only_proxies?" + queryParams.toString();
+        getOnlyProxy(url)
     }
 
     function copyText(elem) {
@@ -165,6 +170,20 @@
         setTimeout(() => {
             toast.classList.remove('show');
         }, 1000);
+    }
+
+    function getOnlyProxy(url) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url)
+        xhr.send()
+        xhr.onload = function() {
+            if (xhr.status != 200) {
+                showToast(`Error ${xhr.status}: ${xhr.statusText}`)
+            } else {
+                document.getElementById('proxy_info').textContent = '';
+                document.getElementById('proxy_info').textContent = xhr.response;
+            }
+        }
     }
 
     generateLink()

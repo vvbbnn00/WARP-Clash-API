@@ -12,7 +12,7 @@ CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
 
 
-def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__name__), best=False):
+def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__name__), best=False, only_proxies=False):
     """
     Generate Clash subscription file
     :param account:
@@ -30,11 +30,13 @@ def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__n
     user_config = []
 
     # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
+    j = 1 
     for i in range(len(random_points)):
         point = random_points[i]
         user_config.append(
             {
-                "name": f"{fake.emoji()} CF-{fake.color_name()}",
+                # "name": f"{fake.emoji()} CF-{fake.color_name()}",
+                "name": f"CF-WARP-{j}",
                 "type": "wireguard",
                 "server": point.ip,
                 "port": point.port,
@@ -44,13 +46,17 @@ def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__n
                 "remote-dns-resolve": False,
                 "udp": False
             })
+        j += 1
     clashJSON = copy.deepcopy(CLASH)
     clashJSON["proxies"] = user_config
     for proxyGroup in clashJSON["proxy-groups"]:
         proxyGroup["proxies"] += [proxy["name"] for proxy in user_config]
 
     # Generate YAML file
-    clashYAML = yaml.dump(clashJSON, allow_unicode=True)
+    if only_proxies:
+        clashYAML = yaml.dump({'proxies': clashJSON['proxies'], 'proxy-groups': clashJSON['proxy-groups']}, allow_unicode=True)
+    else:
+        clashYAML = yaml.dump(clashJSON, allow_unicode=True)
     return clashYAML
 
 

@@ -127,6 +127,20 @@ def attach_endpoints(app: Flask):
 
         return response
 
+    @app.route('/api/only_proxies', methods=['GET'])
+    @rate_limit()
+    @authorized()
+    def only_proxies():
+        account = getCurrentAccount(logger)
+        best = request.args.get('best') or False
+        fileData = generate_Clash_subFile(account, logger, best=best, only_proxies=True)
+
+        response = make_response(fileData)
+        # response.headers = headers
+
+        return response
+        
+
 
 def create_app(app_name: str = "web", logger: logging.Logger = None) -> Flask:
     if logger is None:
