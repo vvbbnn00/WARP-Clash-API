@@ -96,7 +96,9 @@ def attach_endpoints(app: Flask):
     def http_clash():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
-        fileData = generate_Clash_subFile(account, logger, best=best)
+        random_name = request.args.get('randomName').lower() == "true" or False
+
+        fileData = generate_Clash_subFile(account, logger, best=best, random_name=random_name)
 
         headers = {
             'Content-Type': 'application/x-yaml; charset=utf-8',
@@ -115,6 +117,7 @@ def attach_endpoints(app: Flask):
     def http_wireguard():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
+
         fileData = generate_Wireguard_subFile(account, logger, best=best)
 
         headers = {
@@ -133,13 +136,20 @@ def attach_endpoints(app: Flask):
     def only_proxies():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
-        fileData = generate_Clash_subFile(account, logger, best=best, only_proxies=True)
+        random_name = request.args.get('randomName').lower() == "true" or False
+
+        fileData = generate_Clash_subFile(account, logger, best=best, only_proxies=True, random_name=random_name)
 
         response = make_response(fileData)
-        # response.headers = headers
+        headers = {
+            'Content-Type': 'application/x-yaml; charset=utf-8',
+            'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
+            "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
+        }
+
+        response.headers = headers
 
         return response
-        
 
 
 def create_app(app_name: str = "web", logger: logging.Logger = None) -> Flask:

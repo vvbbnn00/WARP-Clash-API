@@ -12,9 +12,15 @@ CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
 
 
-def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__name__), best=False, only_proxies=False):
+def generate_Clash_subFile(account: Account = None,
+                           logger=logging.getLogger(__name__),
+                           best=False,
+                           only_proxies=False,
+                           random_name=False):
     """
     Generate Clash subscription file
+    :param random_name: Whether to use random name
+    :param only_proxies: If this is True, only generate proxies
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
@@ -30,13 +36,12 @@ def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__n
     user_config = []
 
     # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
-    j = 1 
     for i in range(len(random_points)):
         point = random_points[i]
+        name = f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"
         user_config.append(
             {
-                # "name": f"{fake.emoji()} CF-{fake.color_name()}",
-                "name": f"CF-WARP-{j}",
+                "name": name,
                 "type": "wireguard",
                 "server": point.ip,
                 "port": point.port,
@@ -46,7 +51,6 @@ def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__n
                 "remote-dns-resolve": False,
                 "udp": False
             })
-        j += 1
     clashJSON = copy.deepcopy(CLASH)
     clashJSON["proxies"] = user_config
     for proxyGroup in clashJSON["proxy-groups"]:
@@ -54,7 +58,8 @@ def generate_Clash_subFile(account: Account = None, logger=logging.getLogger(__n
 
     # Generate YAML file
     if only_proxies:
-        clashYAML = yaml.dump({'proxies': clashJSON['proxies'], 'proxy-groups': clashJSON['proxy-groups']}, allow_unicode=True)
+        clashYAML = yaml.dump({'proxies': clashJSON['proxies'], 'proxy-groups': clashJSON['proxy-groups']},
+                              allow_unicode=True)
     else:
         clashYAML = yaml.dump(clashJSON, allow_unicode=True)
     return clashYAML
