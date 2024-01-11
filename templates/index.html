@@ -73,7 +73,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
-            background-color: rgba(110, 255, 114, 0.8);
+            background-color: rgba(110, 255, 114);
             color: #4caf50;
             border-radius: 4px;
             font-size: 16px;
@@ -84,6 +84,12 @@
 
         .show {
             opacity: 1;
+        }
+
+        .tip {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -104,6 +110,9 @@
         <label>
             <input type="checkbox" id="alwaysBest" onchange="generateLink()"> 始终选择最优节点
         </label>
+        <label>
+            <input type="checkbox" id="randomName" onchange="generateLink()" checked> 随机节点名称
+        </label>
     </div>
 </form>
 <center>
@@ -113,6 +122,13 @@
     <h2>Wireguard</h2>
     <textarea id="WireguardLink" rows="1" readonly onclick="copyText('WireguardLink')"></textarea>
     <div id="qrcode_wg"></div>
+    <h2>Only Proxies & Proxies Group</h2>
+    <div class="tip">
+        该链接仅包含节点信息，不包含规则信息，适用于自定义规则的用户。
+    </div>
+    <textarea id="onlyProxyLink" rows="1" readonly onclick="copyText('onlyProxyLink')"></textarea>
+    <a onclick="getOnlyProxy()" href="javascript:">点击复制节点信息</a>
+    <textarea id="onlyProxyInfo" rows="0" style="height: 0; width: 0;"></textarea>
     <h2>账户信息</h2>
     <a href="#" title="账户信息" target="_blank" id="AccountLink">点击查看</a>
 </center>
@@ -129,9 +145,11 @@
     function generateLink() {
         const password = document.getElementById('passwordInput').value;
         const best = document.getElementById('alwaysBest').checked;
+        const randomName = document.getElementById('randomName').checked;
         const baseUrl = location.protocol + '//' + location.host + '/api/';
         const queryParams = new URLSearchParams({
-            best
+            best,
+            randomName
         });
 
         if (password.length) {
@@ -141,6 +159,7 @@
         document.getElementById('subscriptionLink').textContent = baseUrl + "clash?" + queryParams.toString();
         document.getElementById('WireguardLink').textContent = baseUrl + "wireguard?" + queryParams.toString();
         document.getElementById('AccountLink').href = baseUrl + "account?" + queryParams.toString();
+        document.getElementById('onlyProxyLink').textContent = baseUrl + "only_proxies?" + queryParams.toString();
 
         const qrcodeContainerClash = document.getElementById('qrcode_clash');
         qrcodeContainerClash.innerHTML = '';
@@ -175,6 +194,18 @@
         setTimeout(() => {
             toast.classList.remove('show');
         }, 1000);
+    }
+
+    function getOnlyProxy() {
+        const url = document.getElementById('onlyProxyLink').textContent;
+        fetch(url, {
+            method: 'GET',
+        }).then(res => res.text()).then(res => {
+            document.getElementById('onlyProxyInfo').textContent = res;
+            copyText('onlyProxyInfo');
+        }).catch(err => {
+            showToast(`Error ${err.status}: ${err.statusText}`)
+        });
     }
 
     generateLink()
