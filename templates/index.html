@@ -169,14 +169,7 @@
             height: 200
         });
 
-        const qrcodeContainerWg = document.getElementById('qrcode_wg');
-        qrcodeContainerWg.innerHTML = '';
-        const qrcode2 = new QRCode(qrcodeContainerWg, {
-            text: document.getElementById('WireguardLink').textContent,
-            width: 200,
-            height: 200
-        });
-
+        getQrCodeWg();
     }
 
     function copyText(elem) {
@@ -203,6 +196,21 @@
         }).then(res => res.text()).then(res => {
             document.getElementById('onlyProxyInfo').textContent = res;
             copyText('onlyProxyInfo');
+        }).catch(err => {
+            showToast(`Error ${err.status}: ${err.statusText}`)
+        });
+    }
+
+    function getQrCodeWg() {
+        const qrcodeContainerWg = document.getElementById('qrcode_wg');
+        const url = document.getElementById('WireguardLink').textContent;
+        fetch(url, {method: 'GET'}).then(res => res.text()).then(res => {
+            qrcodeContainerWg.innerHTML = '';
+            const qrcode2 = new QRCode(qrcodeContainerWg, {
+                text: res,
+                width: 200,
+                height: 200
+            });
         }).catch(err => {
             showToast(`Error ${err.status}: ${err.statusText}`)
         });

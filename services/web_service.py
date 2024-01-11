@@ -122,7 +122,7 @@ def attach_endpoints(app: Flask):
 
         headers = {
             'Content-Type': 'application/x-conf; charset=utf-8',
-            'Content-Disposition': f'attachment; filename=Wireguard-{fake.color_name()}.conf'
+            'Content-Disposition': f'attachment; filename={fake.lexify("????????????").lower()}.conf'
         }
 
         response = make_response(fileData)

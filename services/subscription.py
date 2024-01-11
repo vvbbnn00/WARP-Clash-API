@@ -88,5 +88,6 @@ MTU = 1280
 PublicKey = {CF_CONFIG.get("publicKey")}
 AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = {random_point.ip}:{random_point.port}
+PersistentKeepalive = 25
 """
     return text
