@@ -109,9 +109,10 @@
 <center>
     <h2>Clash</h2>
     <textarea id="subscriptionLink" rows="1" readonly onclick="copyText('subscriptionLink')"></textarea>
-    <div id="qrcode"></div>
+    <div id="qrcode_clash"></div>
     <h2>Wireguard</h2>
     <textarea id="WireguardLink" rows="1" readonly onclick="copyText('WireguardLink')"></textarea>
+    <div id="qrcode_wg"></div>
     <h2>账户信息</h2>
     <a href="#" title="账户信息" target="_blank" id="AccountLink">点击查看</a>
 </center>
@@ -141,13 +142,22 @@
         document.getElementById('WireguardLink').textContent = baseUrl + "wireguard?" + queryParams.toString();
         document.getElementById('AccountLink').href = baseUrl + "account?" + queryParams.toString();
 
-        const qrcodeContainer = document.getElementById('qrcode');
-        qrcodeContainer.innerHTML = '';
-        const qrcode = new QRCode(qrcodeContainer, {
+        const qrcodeContainerClash = document.getElementById('qrcode_clash');
+        qrcodeContainerClash.innerHTML = '';
+        const qrcode = new QRCode(qrcodeContainerClash, {
             text: document.getElementById('subscriptionLink').textContent,
             width: 200,
             height: 200
         });
+
+        const qrcodeContainerWg = document.getElementById('qrcode_wg');
+        qrcodeContainerWg.innerHTML = '';
+        const qrcode2 = new QRCode(qrcodeContainerWg, {
+            text: document.getElementById('WireguardLink').textContent,
+            width: 200,
+            height: 200
+        });
+
     }
 
     function copyText(elem) {

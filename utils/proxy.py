@@ -1,8 +1,10 @@
 import requests
 
+from config import PROXY_POOL_URL
+
 
 def getProxy():
-    ret = requests.get("https://getproxy.bzpl.tech/get/").json()
+    ret = requests.get(PROXY_POOL_URL).json()
     proxy = {}
     if ret.get('proxy'):
         if ret['https']:
@@ -10,4 +12,3 @@ def getProxy():
         else:
             proxy = {"http": {ret['proxy']}}
     return proxy
-

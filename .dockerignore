@@ -1,9 +1,9 @@
-./config/*.json
-./config/*.csv
+config/*.json
+config/*.csv
 .env.local
 Dockerfile
 docker-compose.yaml
 README.md
 LICENSE
-./logs/*.log
-account/account.json
+logs/*.log
+account/*.json

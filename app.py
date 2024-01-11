@@ -59,6 +59,13 @@ def main():
         main(logger=logger)
 
     elif args.command == "optimize":
+        # Fix ./scripts/get_entrypoint.sh if it has CRLF
+        file = open('./scripts/get_entrypoints.sh', 'r')
+        data = file.read().replace('\r\n', '\n')
+        file.close()
+        file = open('./scripts/get_entrypoints.sh', 'w')
+        file.write(data)
+        file.close()
         # Run ./scripts/get_entrypoint.sh
         os.system("bash ./scripts/get_entrypoints.sh")
 
