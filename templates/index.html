@@ -119,6 +119,8 @@
     <h2>Clash</h2>
     <textarea id="subscriptionLink" rows="1" readonly onclick="copyText('subscriptionLink')"></textarea>
     <div id="qrcode_clash"></div>
+    <h2>Surge</h2>
+    <textarea id="subSurgeScriptionLink" rows="1" readonly onclick="copyText('subSurgeScriptionLink')"></textarea>
     <h2>Wireguard</h2>
     <textarea id="WireguardLink" rows="1" readonly onclick="copyText('WireguardLink')"></textarea>
     <div id="qrcode_wg"></div>
@@ -157,6 +159,7 @@
         }
 
         document.getElementById('subscriptionLink').textContent = baseUrl + "clash?" + queryParams.toString();
+        document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "surge?" + queryParams.toString();
         document.getElementById('WireguardLink').textContent = baseUrl + "wireguard?" + queryParams.toString();
         document.getElementById('AccountLink').href = baseUrl + "account?" + queryParams.toString();
         document.getElementById('onlyProxyLink').textContent = baseUrl + "only_proxies?" + queryParams.toString();

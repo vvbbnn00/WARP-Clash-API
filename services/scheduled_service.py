@@ -7,6 +7,11 @@ from services.tasks import doAddDataTaskOnce, saveAccount
 
 
 def main(logger=None):
+    """
+    Start scheduler
+    :param logger:
+    :return:
+    """
     if logger is None:
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger()
@@ -19,9 +24,9 @@ def main(logger=None):
 
     try:
         while True:
-            time.sleep(1)  # 防止主线程退出
+            time.sleep(1)  # Prevent main thread from exiting
     except (KeyboardInterrupt, SystemExit):
-        # 捕获 Ctrl+C 或系统退出事件，关闭调度器
+        # Catch Ctrl+C or system exit event, close scheduler
         scheduler.shutdown()
 
 

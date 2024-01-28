@@ -1,7 +1,7 @@
 import unittest
 
 from utils.proxy import getProxy
-from utils.wireguard import generate_wireguard_keys
+from utils.wireguard import generateWireguardKeys
 from utils.entrypoints import *
 
 
@@ -11,15 +11,15 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(proxy.get("http") or proxy.get("https"))
 
     def test_Wireguard(self):
-        privkey, pubkey = generate_wireguard_keys()
+        privkey, pubkey = generateWireguardKeys()
         self.assertTrue(privkey)
         self.assertTrue(pubkey)
         self.assertEqual(len(privkey), 44)
         self.assertEqual(len(pubkey), 44)
 
     def test_EntryPoints(self):
-        reload_entrypoints()
-        entrypoints = get_entrypoints()
+        reloadEntrypoints()
+        entrypoints = getEntrypoints()
         self.assertTrue(entrypoints)
         self.assertTrue(len(entrypoints) > 0)
 
