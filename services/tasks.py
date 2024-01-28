@@ -4,8 +4,8 @@ import time
 from models import Account
 from services.cloudflare import register
 from services.common import getCurrentAccount
-from utils.wireguard import generate_wireguard_keys
-from services.cloudflare import get_account
+from utils.wireguard import generateWireguardKeys
+from services.cloudflare import getAccount
 from utils.proxy import getProxy
 
 
@@ -24,7 +24,7 @@ def doAddDataTaskOnce(account: Account = None, logger=logging.Logger(__name__)) 
     start = time.time()
 
     try:
-        privkey, pubkey = generate_wireguard_keys()
+        privkey, pubkey = generateWireguardKeys()
         register(pubkey, privkey, referrer=account.account_id, proxy=getProxy())
     except Exception as e:
         logger.warning(f"Failed to get account from Cloudflare.")
@@ -51,7 +51,7 @@ def saveAccount(account: Account = None, logger=logging.Logger(__name__)):
         account = getCurrentAccount(logger)
 
     # Get new account info
-    info = get_account(account)
+    info = getAccount(account)
     logger.info(f"Account info: {info}")
     logger.info(f"Save account to file")
     account.save()

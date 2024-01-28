@@ -9,7 +9,7 @@ import tempfile
 from faker import Faker
 from config import *
 from services.common import *
-from utils.entrypoints import get_entrypoints, get_best_entrypoints
+from utils.entrypoints import getEntrypoints, getBestEntrypoints
 
 CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
@@ -19,11 +19,11 @@ SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 
 
-def generate_Clash_subFile(account: Account = None,
-                           logger=logging.getLogger(__name__),
-                           best=False,
-                           only_proxies=False,
-                           random_name=False):
+def generateClashSubFile(account: Account = None,
+                         logger=logging.getLogger(__name__),
+                         best=False,
+                         only_proxies=False,
+                         random_name=False):
     """
     Generate Clash subscription file
     :param random_name: Whether to use random name
@@ -34,8 +34,8 @@ def generate_Clash_subFile(account: Account = None,
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = get_entrypoints()
-    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else get_best_entrypoints(RANDOM_COUNT)
+    entrypoints = getEntrypoints()
+    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
 
     fake = Faker()
 
@@ -58,21 +58,21 @@ def generate_Clash_subFile(account: Account = None,
                 "remote-dns-resolve": False,
                 "udp": False
             })
-    clashJSON = copy.deepcopy(CLASH)
-    clashJSON["proxies"] = user_config
-    for proxyGroup in clashJSON["proxy-groups"]:
-        proxyGroup["proxies"] += [proxy["name"] for proxy in user_config]
+    clash_json = copy.deepcopy(CLASH)
+    clash_json["proxies"] = user_config
+    for proxy_group in clash_json["proxy-groups"]:
+        proxy_group["proxies"] += [proxy["name"] for proxy in user_config]
 
     # Generate YAML file
     if only_proxies:
-        clashYAML = yaml.dump({'proxies': clashJSON['proxies'], 'proxy-groups': clashJSON['proxy-groups']},
-                              allow_unicode=True)
+        clash_yaml = yaml.dump({'proxies': clash_json['proxies'], 'proxy-groups': clash_json['proxy-groups']},
+                               allow_unicode=True)
     else:
-        clashYAML = yaml.dump(clashJSON, allow_unicode=True)
-    return clashYAML
+        clash_yaml = yaml.dump(clash_json, allow_unicode=True)
+    return clash_yaml
 
 
-def generate_Wireguard_subFile(account: Account = None, logger=logging.getLogger(__name__), best=False):
+def generateWireguardSubFile(account: Account = None, logger=logging.getLogger(__name__), best=False):
     """
     Generate Wireguard subscription file
     :param account:
@@ -81,8 +81,8 @@ def generate_Wireguard_subFile(account: Account = None, logger=logging.getLogger
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = get_entrypoints()
-    random_point = random.choice(entrypoints) if not best else get_best_entrypoints(1)[0]
+    entrypoints = getEntrypoints()
+    random_point = random.choice(entrypoints) if not best else getBestEntrypoints(1)[0]
 
     # Generate user configuration file
     text = f"""[Interface]
@@ -100,11 +100,11 @@ PersistentKeepalive = 25
     return text
 
 
-def generate_Surge_subFile(account: Account = None,
-                           logger=logging.getLogger(__name__),
-                           best=False,
-                           only_proxies=False,
-                           random_name=False):
+def generateSurgeSubFile(account: Account = None,
+                         logger=logging.getLogger(__name__),
+                         best=False,
+                         only_proxies=False,
+                         random_name=False):
     """
     Generate Surge subscription file
     :param random_name: Whether to use random name
@@ -115,8 +115,8 @@ def generate_Surge_subFile(account: Account = None,
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = get_entrypoints()
-    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else get_best_entrypoints(RANDOM_COUNT)
+    entrypoints = getEntrypoints()
+    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
 
     fake = Faker()
 
@@ -135,35 +135,35 @@ def generate_Surge_subFile(account: Account = None,
                 "peer": f'(public-key = {CF_CONFIG.get("publicKey")}, allowed-ips = "0.0.0.0/0, ::/0", endpoint = {point.ip}:{point.port})'
             })
 
-    surgeConfig = copy.deepcopy(SURGE)
+    surge_config = copy.deepcopy(SURGE)
 
     for i, config in enumerate(user_config):
         # random a name like 2FDEC93F, num and upper letter
         name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
 
-        surgeConfig[f'WireGuard {name}'] = config
-        surgeConfig['Proxy'][
+        surge_config[f'WireGuard {name}'] = config
+        surge_config['Proxy'][
             f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"] = (f'wireguard, '
                                                                                                 f'section-name={name}')
 
-    surgeConfig['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surgeConfig['Proxy'].keys())}"
-    surgeConfig['Proxy Group'][
-        'auto'] = (f"url-test, {', '.join(surgeConfig['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
+    surge_config['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surge_config['Proxy'].keys())}"
+    surge_config['Proxy Group'][
+        'auto'] = (f"url-test, {', '.join(surge_config['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
                    f"interval=43200")
-    surgeConfig['Proxy Group'][
-        'fallback'] = (f"fallback, {', '.join(surgeConfig['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
+    surge_config['Proxy Group'][
+        'fallback'] = (f"fallback, {', '.join(surge_config['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
                        f"interval=43200")
 
     # generate a tmp file to store the path of surge.ini
     temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False, encoding='utf8')
-    surgeConfig.write(temp_file)
+    surge_config.write(temp_file)
     temp_file.seek(0)
-    surgeINI = temp_file.read()
+    surge_ini = temp_file.read()
 
     # Generate INI file
     if only_proxies:
         pass
     else:
-        surgeINI += SURGE_RULE
+        surge_ini += SURGE_RULE
 
-    return surgeINI
+    return surge_ini

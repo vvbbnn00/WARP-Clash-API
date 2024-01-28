@@ -16,10 +16,10 @@ DEFAULT_HEADERS = {
 
 SESSION = requests.Session()
 SESSION.headers.update(DEFAULT_HEADERS)
-fake = faker.Faker()
+FAKE = faker.Faker()
 
 
-def gen_account_from_response(response, referrer=None, private_key=None) -> Account:
+def genAccountFromResponse(response, referrer=None, private_key=None) -> Account:
     """
     Generate an account from a response
     :param private_key:
@@ -44,7 +44,7 @@ def gen_account_from_response(response, referrer=None, private_key=None) -> Acco
     return account
 
 
-def register(public_key, private_key, device_model=f"{fake.company()} {fake.country()}", referrer="",
+def register(public_key, private_key, device_model=f"{FAKE.company()} {FAKE.country()}", referrer="",
              proxy=None) -> Account:
     """
     Register a new device
@@ -58,27 +58,27 @@ def register(public_key, private_key, device_model=f"{fake.company()} {fake.coun
     """
     timestamp = datetime.datetime.now().isoformat()[:-3] + "+02:00"
     # install_id is 43 characters long
-    install_id = fake.pystr(min_chars=43, max_chars=43)
+    install_id = FAKE.pystr(min_chars=43, max_chars=43)
     data = {
         # 152 characters in total
-        "fcm_token": "{}:APA91b{}".format(install_id, fake.pystr(min_chars=134, max_chars=134)),
+        "fcm_token": "{}:APA91b{}".format(install_id, FAKE.pystr(min_chars=134, max_chars=134)),
         "install_id": install_id,
         "key": public_key,
         "warp_enabled": True,
         "locale": "en_US",
         "model": device_model,
         "tos": timestamp,
-        "type": fake.random_element(elements=("Android", "iOS")),
+        "type": FAKE.random_element(elements=("Android", "iOS")),
     }
     if referrer:
         data["referrer"] = referrer
     response = SESSION.post(f"{API_URL}/{API_VERSION}/reg", json=data, proxies=proxy)
     response.raise_for_status()
 
-    return gen_account_from_response(response.json(), private_key=private_key, referrer=referrer)
+    return genAccountFromResponse(response.json(), referrer=referrer, private_key=private_key)
 
 
-def get_account(account: Account, proxy=None) -> dict:
+def getAccount(account: Account, proxy=None) -> dict:
     """
     Get account details and update the account object
 
@@ -101,11 +101,10 @@ def get_account(account: Account, proxy=None) -> dict:
     return data["account"]
 
 
-def get_client_config(proxy=None) -> dict:
+def getClientConfig(proxy=None) -> dict:
     """
     Get client config
 
-    :param account: account
     :param proxy: proxy dict
     :return:
     """

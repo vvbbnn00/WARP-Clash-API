@@ -3,12 +3,16 @@ import os
 import sys
 
 from config import PORT, HOST
-from utils.logger import create_logger
+from utils.logger import createLogger
 
 
-def linux_start_web():
+def linuxStartWeb():
+    """
+    Start web service on linux
+    :return:
+    """
     from gunicorn.app.base import BaseApplication
-    from services.web_service import create_app
+    from services.web_service import createApp
 
     class FlaskGunicornApp(BaseApplication):
         def __init__(self, flaskapp, options=None):
@@ -25,7 +29,7 @@ def linux_start_web():
         def load(self):
             return self.application
 
-    app = create_app("web")
+    app = createApp("web")
     FlaskGunicornApp(app, options={
         "bind": f"{HOST}:{PORT}",
         "workers": 4,
@@ -36,25 +40,29 @@ def linux_start_web():
 
 
 def main():
+    """
+    Main function
+    :return:
+    """
     parser = argparse.ArgumentParser(description="WARP Clash API")
     parser.add_argument("command", choices=["web", "background", "optimize"], help="Command to run")
 
     args = parser.parse_args()
 
     if args.command == "web":
-        logger = create_logger("app_web")
-        from services.web_service import create_app
-        app = create_app("web", logger=logger)
+        logger = createLogger("app_web")
+        from services.web_service import createApp
+        app = createApp("web", logger=logger)
 
         # If windows, use app.run()
         if sys.platform == "win32":
             app.run(host=HOST, port=PORT)
         # If linux, use gunicorn
         else:
-            linux_start_web()
+            linuxStartWeb()
 
     elif args.command == "background":
-        logger = create_logger("app_background")
+        logger = createLogger("app_background")
         from services.scheduled_service import main
         main(logger=logger)
 

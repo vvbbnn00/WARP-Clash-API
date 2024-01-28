@@ -3,28 +3,34 @@ import os
 from logging.handlers import TimedRotatingFileHandler
 
 
-def create_logger(filename, level=logging.INFO):
-    # 创建日志目录
+def createLogger(filename, level=logging.INFO):
+    """
+    Create logger with TimedRotatingFileHandler
+    :param filename: filename
+    :param level: logging level
+    :return: logger
+    """
+    # Create logs directory
     if not os.path.exists("logs"):
         os.makedirs("logs")
 
-    # 创建日志记录器
+    # Create logger
     logger = logging.getLogger(filename)
     logger.setLevel(level)
 
-    # 创建 TimedRotatingFileHandler，每天自动切分日志文件
+    # Create TimedRotatingFileHandler to rotate log file
     log_filename = os.path.join("logs", filename + ".log")
     file_handler = TimedRotatingFileHandler(log_filename, when="midnight", interval=1, backupCount=7)
 
-    # 设置日志格式
+    # Create formatter
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(formatter)
 
-    # 创建 StreamHandler，用于将日志输出到控制台
+    # Create StreamHandler to output to console
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
 
-    # 将处理器添加到记录器
+    # Add handlers
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
 

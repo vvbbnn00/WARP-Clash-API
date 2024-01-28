@@ -7,17 +7,26 @@ ENTRYPOINTS = []
 FILE_PATH = './config/result.csv'
 
 
-def read_csv(file_path):
+def readCsv(file_path):
+    """
+    Read csv file
+    :param file_path: file path
+    :return: generator
+    """
     with open(file_path, 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             yield row
 
 
-def reload_entrypoints():
+def reloadEntrypoints():
+    """
+    Reload entrypoints from csv file
+    :return: list of entrypoints
+    """
     global ENTRYPOINTS
     ENTRYPOINTS = []
-    for row in read_csv(FILE_PATH):
+    for row in readCsv(FILE_PATH):
         if row[0].lower() == 'ip:port':
             continue
         ip, port = row[0].split(':')
@@ -38,27 +47,31 @@ def reload_entrypoints():
     return ENTRYPOINTS
 
 
-def get_entrypoints():
+def getEntrypoints():
+    """
+    Get entrypoints
+    :return: list of entrypoints
+    """
     if not ENTRYPOINTS:
-        reload_entrypoints()
+        reloadEntrypoints()
     return ENTRYPOINTS
 
 
-def get_best_entrypoints(num=1):
+def getBestEntrypoints(num=1):
     """
     Get best entrypoints
-    :param num:
-    :return:
+    :param num: number of entrypoints
+    :return: list of entrypoints
     """
     if not ENTRYPOINTS:
-        reload_entrypoints()
+        reloadEntrypoints()
 
     # sort by loss and delay
     returnEntryPoints = sorted(ENTRYPOINTS, key=lambda x: (x.loss, x.delay))[:num]
     return returnEntryPoints
 
 
-if __name__ == '__main__':
-    reload_entrypoints()
-    print(ENTRYPOINTS)
-    print(len(ENTRYPOINTS))
+# if __name__ == '__main__':
+#     reloadEntrypoints()
+#     print(ENTRYPOINTS)
+#     print(len(ENTRYPOINTS))

@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
-from services.subscription import generate_Clash_subFile, generate_Wireguard_subFile, generate_Surge_subFile
+from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile
 from services.common import *
 from faker import Faker
 
@@ -18,7 +18,7 @@ def authorized():
 
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decoratedFunction(*args, **kwargs):
 
             key = request.headers.get('X-Api-Key') or request.args.get('key')
 
@@ -30,12 +30,12 @@ def authorized():
                     'message': 'Unauthorized'
                 }, 403
 
-        return decorated_function
+        return decoratedFunction
 
     return decorator
 
 
-def rate_limit(limit: int = REQUEST_RATE_LIMIT):
+def rateLimit(limit: int = REQUEST_RATE_LIMIT):
     """
     Rate limit decorator
     :param limit:
@@ -44,7 +44,7 @@ def rate_limit(limit: int = REQUEST_RATE_LIMIT):
 
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decoratedFunction(*args, **kwargs):
 
             remote_addr = request.headers.get('X-Forwarded-For') or request.remote_addr
 
@@ -65,24 +65,29 @@ def rate_limit(limit: int = REQUEST_RATE_LIMIT):
 
             return f(*args, **kwargs)
 
-        return decorated_function
+        return decoratedFunction
 
     return decorator
 
 
-def attach_endpoints(app: Flask):
+def attachEndpoints(app: Flask):
+    """
+    Attach endpoints to app
+    :param app:
+    :return:
+    """
     logger = app.logger
     logger.setLevel(logging.INFO)
     fake = Faker()
 
     @app.route('/')
-    def http_index():
+    def httpIndex():
         return render_template('index.html')
 
     @app.route('/api/account', methods=['GET'])
-    @rate_limit()
+    @rateLimit()
     @authorized()
-    def http_account():
+    def httpAccount():
         account = getCurrentAccount(logger)
         return {
             'code': 200,
@@ -91,14 +96,14 @@ def attach_endpoints(app: Flask):
         }
 
     @app.route('/api/clash', methods=['GET'])
-    @rate_limit()
+    @rateLimit()
     @authorized()
-    def http_clash():
+    def httpClash():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
         random_name = request.args.get('randomName').lower() == "true" or False
 
-        fileData = generate_Clash_subFile(account, logger, best=best, random_name=random_name)
+        fileData = generateClashSubFile(account, logger, best=best, random_name=random_name)
 
         headers = {
             'Content-Type': 'application/x-yaml; charset=utf-8',
@@ -112,13 +117,13 @@ def attach_endpoints(app: Flask):
         return response
 
     @app.route('/api/wireguard', methods=['GET'])
-    @rate_limit()
+    @rateLimit()
     @authorized()
-    def http_wireguard():
+    def httpWireguard():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
 
-        fileData = generate_Wireguard_subFile(account, logger, best=best)
+        fileData = generateWireguardSubFile(account, logger, best=best)
 
         headers = {
             'Content-Type': 'application/x-conf; charset=utf-8',
@@ -131,14 +136,14 @@ def attach_endpoints(app: Flask):
         return response
 
     @app.route('/api/only_proxies', methods=['GET'])
-    @rate_limit()
+    @rateLimit()
     @authorized()
-    def only_proxies():
+    def httpOnlyProxies():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
         random_name = request.args.get('randomName').lower() == "true" or False
 
-        fileData = generate_Clash_subFile(account, logger, best=best, only_proxies=True, random_name=random_name)
+        fileData = generateClashSubFile(account, logger, best=best, only_proxies=True, random_name=random_name)
 
         response = make_response(fileData)
         headers = {
@@ -152,14 +157,14 @@ def attach_endpoints(app: Flask):
         return response
 
     @app.route('/api/surge', methods=['GET'])
-    @rate_limit()
+    @rateLimit()
     @authorized()
-    def http_surge():
+    def httpSurge():
         account = getCurrentAccount(logger)
         best = request.args.get('best') or False
         random_name = request.args.get('randomName').lower() == "true" or False
 
-        fileData = generate_Surge_subFile(account, logger, best=best, random_name=random_name)
+        fileData = generateSurgeSubFile(account, logger, best=best, random_name=random_name)
 
         headers = {
             'Content-Type': 'text/plain; charset=utf-8',
@@ -173,7 +178,13 @@ def attach_endpoints(app: Flask):
         return response
 
 
-def create_app(app_name: str = "web", logger: logging.Logger = None) -> Flask:
+def createApp(app_name: str = "web", logger: logging.Logger = None) -> Flask:
+    """
+    Create Flask app
+    :param app_name:
+    :param logger:
+    :return:
+    """
     if logger is None:
         logger = logging.getLogger()
     app = Flask(app_name)
@@ -185,10 +196,10 @@ def create_app(app_name: str = "web", logger: logging.Logger = None) -> Flask:
         app.logger.addHandler(handler)
     app.logger.setLevel(logger.level)
 
-    attach_endpoints(app)
+    attachEndpoints(app)
     return app
 
 
 if __name__ == '__main__':
-    runApp = create_app()
+    runApp = createApp()
     runApp.run(host='0.0.0.0', port=5000, debug=True)
