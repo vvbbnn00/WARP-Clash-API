@@ -15,8 +15,9 @@ CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
 
 SURGE = configparser.ConfigParser()
-SURGE.read("./config/surge.conf")
+SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
+
 
 def generate_Clash_subFile(account: Account = None,
                            logger=logging.getLogger(__name__),
@@ -136,19 +137,25 @@ def generate_Surge_subFile(account: Account = None,
 
     surgeConfig = copy.deepcopy(SURGE)
 
-    for config in user_config:
+    for i, config in enumerate(user_config):
         # random a name like 2FDEC93F, num and upper letter
         name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
-        
+
         surgeConfig[f'WireGuard {name}'] = config
-        surgeConfig['Proxy'][f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"] = f'wireguard, section-name={name}'
-    
+        surgeConfig['Proxy'][
+            f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"] = (f'wireguard, '
+                                                                                                f'section-name={name}')
+
     surgeConfig['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surgeConfig['Proxy'].keys())}"
-    surgeConfig['Proxy Group']['auto'] = f"url-test, {', '.join(surgeConfig['Proxy'].keys()) }, url=http://www.gstatic.com/generate_204, interval=43200"
-    surgeConfig['Proxy Group']['fallback'] = f"fallback, {', '.join(surgeConfig['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, interval=43200"
+    surgeConfig['Proxy Group'][
+        'auto'] = (f"url-test, {', '.join(surgeConfig['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
+                   f"interval=43200")
+    surgeConfig['Proxy Group'][
+        'fallback'] = (f"fallback, {', '.join(surgeConfig['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
+                       f"interval=43200")
 
     # generate a tmp file to store the path of surge.ini
-    temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+    temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False, encoding='utf8')
     surgeConfig.write(temp_file)
     temp_file.seek(0)
     surgeINI = temp_file.read()
