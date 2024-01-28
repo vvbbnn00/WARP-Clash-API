@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
-from services.subscription import generate_Clash_subFile, generate_Wireguard_subFile
+from services.subscription import generate_Clash_subFile, generate_Wireguard_subFile, generate_Surge_subFile
 from services.common import *
 from faker import Faker
 
@@ -147,6 +147,27 @@ def attach_endpoints(app: Flask):
             "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
         }
 
+        response.headers = headers
+
+        return response
+
+    @app.route('/api/surge', methods=['GET'])
+    @rate_limit()
+    @authorized()
+    def http_surge():
+        account = getCurrentAccount(logger)
+        best = request.args.get('best') or False
+        random_name = request.args.get('randomName').lower() == "true" or False
+
+        fileData = generate_Surge_subFile(account, logger, best=best, random_name=random_name)
+
+        headers = {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Content-Disposition': 'attachment; filename=surge.conf',
+            "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
+        }
+
+        response = make_response(fileData)
         response.headers = headers
 
         return response

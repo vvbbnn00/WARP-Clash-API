@@ -2,6 +2,9 @@ import copy
 import json
 import random
 import yaml
+import configparser
+import string
+import tempfile
 
 from faker import Faker
 from config import *
@@ -11,6 +14,9 @@ from utils.entrypoints import get_entrypoints, get_best_entrypoints
 CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
 
+SURGE = configparser.ConfigParser()
+SURGE.read("./config/surge.conf")
+SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 
 def generate_Clash_subFile(account: Account = None,
                            logger=logging.getLogger(__name__),
@@ -91,3 +97,68 @@ Endpoint = {random_point.ip}:{random_point.port}
 PersistentKeepalive = 25
 """
     return text
+
+
+def generate_Surge_subFile(account: Account = None,
+                           logger=logging.getLogger(__name__),
+                           best=False,
+                           only_proxies=False,
+                           random_name=False):
+    """
+    Generate Surge subscription file
+    :param random_name: Whether to use random name
+    :param only_proxies: If this is True, only generate proxies
+    :param account:
+    :param logger:
+    :param best: Whether to use the best entrypoints
+    :return:
+    """
+    account = getCurrentAccount(logger) if account is None else account
+    entrypoints = get_entrypoints()
+    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else get_best_entrypoints(RANDOM_COUNT)
+
+    fake = Faker()
+
+    # Generate user configuration file
+    user_config = []
+
+    # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
+    for i in range(len(random_points)):
+        point = random_points[i]
+        user_config.append(
+            {
+                "self-ip": point.ip,
+                "private-key": account.private_key,
+                "dns-server": "1.1.1.1",
+                "mtu": 1420,
+                "peer": f'(public-key = {CF_CONFIG.get("publicKey")}, allowed-ips = "0.0.0.0/0, ::/0", endpoint = {point.ip}:{point.port})'
+            })
+
+    surgeConfig = copy.deepcopy(SURGE)
+
+    for config in user_config:
+        # random a name like 2FDEC93F, num and upper letter
+        name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
+        
+        surgeConfig[f'WireGuard {name}'] = config
+        surgeConfig['Proxy'][f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"] = f'wireguard, section-name={name}'
+    
+    surgeConfig['Proxy Group']['Proxy'] = "select, auto, fallback, " + ', '.join(surgeConfig['Proxy'].keys())
+    surgeConfig['Proxy Group']['auto'] = "url-test, " + ', '.join(surgeConfig['Proxy'].keys()) + ', url=http://www.gstatic.com/generate_204, interval=43200'
+    surgeConfig['Proxy Group']['fallback'] = "fallback, " + ', '.join(surgeConfig['Proxy'].keys()) + ', url=http://www.gstatic.com/generate_204, interval=43200'
+
+    # Generate INI file
+    if only_proxies:
+        # generate a tmp file to store the path of surge.ini
+        temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+        surgeConfig.write(temp_file)
+        temp_file.seek(0)
+        surgeINI = temp_file.read()
+    else:
+        temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+        surgeConfig.write(temp_file)
+        temp_file.seek(0)
+        surgeINI = temp_file.read()
+        surgeINI += SURGE_RULE
+
+    return surgeINI

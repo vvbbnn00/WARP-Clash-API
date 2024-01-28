@@ -5,3 +5,4 @@ venv
 
 *.local
 logs/*.log
+__pycache__
