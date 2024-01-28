@@ -143,22 +143,20 @@ def generate_Surge_subFile(account: Account = None,
         surgeConfig[f'WireGuard {name}'] = config
         surgeConfig['Proxy'][f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"] = f'wireguard, section-name={name}'
     
-    surgeConfig['Proxy Group']['Proxy'] = "select, auto, fallback, " + ', '.join(surgeConfig['Proxy'].keys())
-    surgeConfig['Proxy Group']['auto'] = "url-test, " + ', '.join(surgeConfig['Proxy'].keys()) + ', url=http://www.gstatic.com/generate_204, interval=43200'
-    surgeConfig['Proxy Group']['fallback'] = "fallback, " + ', '.join(surgeConfig['Proxy'].keys()) + ', url=http://www.gstatic.com/generate_204, interval=43200'
+    surgeConfig['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surgeConfig['Proxy'].keys())}"
+    surgeConfig['Proxy Group']['auto'] = f"url-test, {', '.join(surgeConfig['Proxy'].keys()) }, url=http://www.gstatic.com/generate_204, interval=43200"
+    surgeConfig['Proxy Group']['fallback'] = f"fallback, {', '.join(surgeConfig['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, interval=43200"
+
+    # generate a tmp file to store the path of surge.ini
+    temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+    surgeConfig.write(temp_file)
+    temp_file.seek(0)
+    surgeINI = temp_file.read()
 
     # Generate INI file
     if only_proxies:
-        # generate a tmp file to store the path of surge.ini
-        temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-        surgeConfig.write(temp_file)
-        temp_file.seek(0)
-        surgeINI = temp_file.read()
+        pass
     else:
-        temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-        surgeConfig.write(temp_file)
-        temp_file.seek(0)
-        surgeINI = temp_file.read()
         surgeINI += SURGE_RULE
 
     return surgeINI
