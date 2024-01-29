@@ -94,7 +94,7 @@ Here are the available environment variables:
 | LOSS_THRESHOLD     | 10                                | Packet loss threshold; IPs exceeding this threshold will be removed.                                                                                           |
 | DELAY_THRESHOLD    | 500                               | Delay threshold; IPs exceeding this threshold will be removed.                                                                                                 |
 | PROXY_POOL_URL     | `https://getproxy.bzpl.tech/get/` | IP proxy pool address, used to get `WARP+` traffic. You can build it yourself, check [proxy_pool](https://github.com/jhao104/proxy_pool) for more information. |
-| PUBLIC_URL        | None                                | When deployed on the public network, fill in the public IP or domain name to generate subscription links.  |
+| PUBLIC_URL        | None                                | When deployed on the public network, fill in the public IP or domain name to generate subscription links. for example `https://subs.zeabur.app`  |
 
 
 ## 🗂️ Attribution
