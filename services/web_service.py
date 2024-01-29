@@ -95,82 +95,49 @@ def attachEndpoints(app: Flask):
             'data': account.__dict__
         }
 
-    @app.route('/api/clash', methods=['GET'])
+    @app.route('/api/<string:sub_type>', methods=['GET'])
     @rateLimit()
     @authorized()
-    def httpClash():
+    def httpSubscription(sub_type: str):
         account = getCurrentAccount(logger)
-        best = request.args.get('best') or False
-        random_name = request.args.get('randomName').lower() == "true" or False
+        best = request.args.get('best', 'false').lower() == "true" or False
+        random_name = request.args.get('randomName', 'false').lower() == "true" or False
 
-        fileData = generateClashSubFile(account, logger, best=best, random_name=random_name)
-
-        headers = {
-            'Content-Type': 'application/x-yaml; charset=utf-8',
-            'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
-            "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
-        }
-
-        response = make_response(fileData)
-        response.headers = headers
-
-        return response
-
-    @app.route('/api/wireguard', methods=['GET'])
-    @rateLimit()
-    @authorized()
-    def httpWireguard():
-        account = getCurrentAccount(logger)
-        best = request.args.get('best') or False
-
-        fileData = generateWireguardSubFile(account, logger, best=best)
-
-        headers = {
-            'Content-Type': 'application/x-conf; charset=utf-8',
-            'Content-Disposition': f'attachment; filename={fake.lexify("????????????").lower()}.conf'
-        }
-
-        response = make_response(fileData)
-        response.headers = headers
-
-        return response
-
-    @app.route('/api/only_proxies', methods=['GET'])
-    @rateLimit()
-    @authorized()
-    def httpOnlyProxies():
-        account = getCurrentAccount(logger)
-        best = request.args.get('best') or False
-        random_name = request.args.get('randomName').lower() == "true" or False
-
-        fileData = generateClashSubFile(account, logger, best=best, only_proxies=True, random_name=random_name)
-
-        response = make_response(fileData)
-        headers = {
-            'Content-Type': 'application/x-yaml; charset=utf-8',
-            'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
-            "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
-        }
-
-        response.headers = headers
-
-        return response
-
-    @app.route('/api/surge', methods=['GET'])
-    @rateLimit()
-    @authorized()
-    def httpSurge():
-        account = getCurrentAccount(logger)
-        best = request.args.get('best') or False
-        random_name = request.args.get('randomName').lower() == "true" or False
-
-        fileData = generateSurgeSubFile(account, logger, best=best, random_name=random_name)
-
-        headers = {
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Disposition': 'attachment; filename=surge.conf',
-            "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; expire=253388144714"
-        }
+        if sub_type == "clash":  # Clash
+            fileData = generateClashSubFile(account, logger, best=best, only_proxies=False, random_name=random_name)
+            headers = {
+                'Content-Type': 'application/x-yaml; charset=utf-8',
+                'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
+                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
+                                         f"expire=253388144714"
+            }
+        elif sub_type == "wireguard":  # Wireguard
+            fileData = generateWireguardSubFile(account, logger, best=best)
+            headers = {
+                'Content-Type': 'application/x-conf; charset=utf-8',
+                'Content-Disposition': f'attachment; filename={fake.lexify("????????????").lower()}.conf'
+            }
+        elif sub_type == "surge":  # Surge
+            fileData = generateSurgeSubFile(account, logger, best=best, random_name=random_name)
+            headers = {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Content-Disposition': 'attachment; filename=surge.conf',
+                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
+                                         f"expire=253388144714"
+            }
+        elif sub_type == "only_proxies":  # Only proxies
+            fileData = generateClashSubFile(account, logger, best=best, only_proxies=True, random_name=random_name)
+            headers = {
+                'Content-Type': 'application/x-yaml; charset=utf-8',
+                'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
+                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
+                                         f"expire=253388144714"
+            }
+        else:
+            return {
+                'code': 400,
+                'message': 'Unsupported sub type.'
+            }, 400
 
         response = make_response(fileData)
         response.headers = headers

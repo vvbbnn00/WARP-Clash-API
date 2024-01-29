@@ -74,7 +74,9 @@ def generateClashSubFile(account: Account = None,
     return clash_yaml
 
 
-def generateWireguardSubFile(account: Account = None, logger=logging.getLogger(__name__), best=False):
+def generateWireguardSubFile(account: Account = None,
+                             logger=logging.getLogger(__name__),
+                             best=False):
     """
     Generate Wireguard subscription file
     :param account:
