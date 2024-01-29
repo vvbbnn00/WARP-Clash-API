@@ -10,6 +10,7 @@ from faker import Faker
 from config import *
 from services.common import *
 from utils.entrypoints import getEntrypoints, getBestEntrypoints
+from flask import request
 
 CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
@@ -18,6 +19,7 @@ SURGE = configparser.ConfigParser()
 SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
+
 
 def generateClashSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
@@ -147,12 +149,10 @@ def generateSurgeSubFile(account: Account = None,
                                                                                                 f'section-name={name}')
 
     surge_config['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surge_config['Proxy'].keys())}"
-    surge_config['Proxy Group'][
-        'auto'] = (f"url-test, {', '.join(surge_config['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
-                   f"interval=43200")
-    surge_config['Proxy Group'][
-        'fallback'] = (f"fallback, {', '.join(surge_config['Proxy'].keys())}, url=http://www.gstatic.com/generate_204, "
-                       f"interval=43200")
+    surge_config['Proxy Group']['auto'] = (f"url-test, {', '.join(surge_config['Proxy'].keys())}, "
+                                           f"url=http://www.gstatic.com/generate_204, interval=43200")
+    surge_config['Proxy Group']['fallback'] = (f"fallback, {', '.join(surge_config['Proxy'].keys())}, "
+                                               f"url=http://www.gstatic.com/generate_204, interval=43200")
 
     # generate a tmp file to store the path of surge.ini
     temp_file = tempfile.NamedTemporaryFile(mode='w+t', delete=False, encoding='utf8')
@@ -165,9 +165,14 @@ def generateSurgeSubFile(account: Account = None,
         pass
     else:
         surge_ini += SURGE_RULE
- 
-    print(PUBLIC_URL)
-    if PUBLIC_URL is not None:
-        surge_ini = SURGE_SUB.replace("{PUBLIC_URL}",f"{PUBLIC_URL}/surge") + surge_ini
+
+    # Generate subscription link, use public_url if it is not None
+    public_url = PUBLIC_URL
+    if public_url is None:
+        # Get public url from request
+        public_url = request.url_root[:-1]
+
+    surge_ini = SURGE_SUB.replace("{PUBLIC_URL}",
+                                  f"{public_url}/api/surge?best={str(best).lower()}&randomName={str(random_name).lower()}") + surge_ini
 
     return surge_ini
