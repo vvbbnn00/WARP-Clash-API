@@ -35,7 +35,7 @@ git clone https://github.com/vvbbnn00/WARP-Clash-API.git
 
 ### 3. [可选] 配置`SECRET_KEY`
 
-若您需要在公网上部署该项目，建议您配置`SECRET_KEY`。在项目目录下创建`.env.local`文件，写入如下内容：
+若您需要在公网上部署该项目，建议您配置`SECRET_KEY`与`PUBLIC_URL`。在项目目录下创建`.env.local`文件，写入如下内容：
 
 ```bash
 SECRET_KEY=your_secret_key
@@ -86,6 +86,7 @@ python3 app.py optimize
 | LOSS_THRESHOLD     | 10                                | 丢包率阈值，超过该阈值的`IP`将被剔除                                                                |
 | DELAY_THRESHOLD    | 500                               | 延迟阈值，超过该阈值的`IP`将被剔除                                                                 |
 | PROXY_POOL_URL     | `https://getproxy.bzpl.tech/get/` | IP代理池地址，用于刷取`WARP+`流量，您可以自行搭建，参照[proxy_pool](https://github.com/jhao104/proxy_pool) |
+| PUBLIC_URL        | 无                                | 部署在公网上时，填写公网`IP`或域名，用于生成订阅链接  |
 
 ## 🗂️ 引用项目
 

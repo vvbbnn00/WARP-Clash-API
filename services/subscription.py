@@ -17,7 +17,7 @@ CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
 SURGE = configparser.ConfigParser()
 SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
-
+SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
 
 def generateClashSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
@@ -165,5 +165,10 @@ def generateSurgeSubFile(account: Account = None,
         pass
     else:
         surge_ini += SURGE_RULE
+ 
+    print(PUBLIC_URL)
+    if PUBLIC_URL is not None:
+        # TODO: add default route and chagne url to default route
+        surge_ini = SURGE_SUB.replace("{PUBLIC_URL}",f"{PUBLIC_URL}/api/surge?best=false&randomName=true") + surge_ini
 
     return surge_ini

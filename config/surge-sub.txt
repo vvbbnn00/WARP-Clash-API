@@ -1,0 +1,4 @@
+#!MANAGED-CONFIG {PUBLIC_URL} interval=43200 strict=true
+# Surge 的规则配置手册: https://manual.nssurge.com/
+# Thanks @Hackl0us SS-Rule-Snippet
+# Thanks @CorrectRoadH WARP+ to Surge
