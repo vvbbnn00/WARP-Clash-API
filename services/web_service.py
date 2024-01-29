@@ -1,7 +1,7 @@
 import time
 from functools import wraps
 
-from flask import Flask, request, make_response, current_app, render_template
+from flask import Flask, request, make_response, current_app, render_template, redirect, url_for
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile
 from services.common import *
@@ -93,8 +93,8 @@ def attachEndpoints(app: Flask):
             'code': 200,
             'message': 'ok',
             'data': account.__dict__
-        }
-
+        }    
+    
     @app.route('/api/clash', methods=['GET'])
     @rateLimit()
     @authorized()
@@ -115,6 +115,15 @@ def attachEndpoints(app: Flask):
         response.headers = headers
 
         return response
+    
+    @app.route('/clash', methods=['GET'])
+    @rateLimit()
+    @authorized()
+    def httpClashDefault():
+        request.args = request.args.copy()
+        request.args['best'] = 'false'
+        request.args['randomName'] = 'true'
+        httpClash()
 
     @app.route('/api/wireguard', methods=['GET'])
     @rateLimit()
@@ -134,6 +143,15 @@ def attachEndpoints(app: Flask):
         response.headers = headers
 
         return response
+    
+    @app.route('/wireguard', methods=['GET'])
+    @rateLimit()
+    @authorized()
+    def httpWireguardDefault():
+        request.args = request.args.copy()
+        request.args['best'] = 'false'
+        return httpWireguard()
+
 
     @app.route('/api/only_proxies', methods=['GET'])
     @rateLimit()
@@ -176,7 +194,15 @@ def attachEndpoints(app: Flask):
         response.headers = headers
 
         return response
-
+    
+    @app.route('/surge', methods=['GET'])
+    @rateLimit()
+    @authorized()
+    def httpSurgeDefault():
+        request.args = request.args.copy()
+        request.args['best'] = 'false'
+        request.args['randomName'] = 'true'
+        return httpSurge()
 
 def createApp(app_name: str = "web", logger: logging.Logger = None) -> Flask:
     """
