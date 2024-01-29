@@ -93,8 +93,8 @@ def attachEndpoints(app: Flask):
             'code': 200,
             'message': 'ok',
             'data': account.__dict__
-        }    
-    
+        }
+
     @app.route('/api/clash', methods=['GET'])
     @rateLimit()
     @authorized()
