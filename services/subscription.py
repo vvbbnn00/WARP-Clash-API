@@ -168,7 +168,6 @@ def generateSurgeSubFile(account: Account = None,
  
     print(PUBLIC_URL)
     if PUBLIC_URL is not None:
-        # TODO: add default route and chagne url to default route
-        surge_ini = SURGE_SUB.replace("{PUBLIC_URL}",f"{PUBLIC_URL}/api/surge?best=false&randomName=true") + surge_ini
+        surge_ini = SURGE_SUB.replace("{PUBLIC_URL}",f"{PUBLIC_URL}/surge") + surge_ini
 
     return surge_ini
