@@ -1,7 +1,7 @@
 import time
 from functools import wraps
 
-from flask import Flask, request, make_response, current_app, render_template, redirect, url_for
+from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile
 from services.common import *
