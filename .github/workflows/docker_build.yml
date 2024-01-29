@@ -40,9 +40,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: GITHUB_ACTIONS=${{ github.action }}
-        env:
-          GITHUB_ACTIONS: true
+          build-args: GITHUB_ACTIONS=true
 
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
