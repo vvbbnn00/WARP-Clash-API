@@ -12,6 +12,8 @@ from services.common import *
 from utils.entrypoints import getEntrypoints, getBestEntrypoints
 from flask import request
 
+from utils.geoip import GeoIP
+
 CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
 
@@ -19,6 +21,8 @@ SURGE = configparser.ConfigParser()
 SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
+
+GEOIP = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
 
 
 def generateClashSubFile(account: Account = None,
@@ -47,7 +51,10 @@ def generateClashSubFile(account: Account = None,
     # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
     for i in range(len(random_points)):
         point = random_points[i]
-        name = f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"
+        country = GEOIP.lookup(point.ip)
+        country_emoji = GEOIP.lookup_emoji(point.ip)
+        name = f"{country_emoji} {country}-CF-{fake.color_name()}" if random_name else \
+            f"{country_emoji} {country}-CF-WARP-{i + 1}"
         user_config.append(
             {
                 "name": name,
@@ -136,7 +143,8 @@ def generateSurgeSubFile(account: Account = None,
                 "private-key": account.private_key,
                 "dns-server": "1.1.1.1",
                 "mtu": 1420,
-                "peer": f'(public-key = {CF_CONFIG.get("publicKey")}, allowed-ips = "0.0.0.0/0, ::/0", endpoint = {point.ip}:{point.port})'
+                "peer": f'(public-key = {CF_CONFIG.get("publicKey")}, allowed-ips = "0.0.0.0/0, ::/0", '
+                        f'endpoint = {point.ip}:{point.port})'
             })
 
     surge_config = copy.deepcopy(SURGE)
@@ -144,11 +152,13 @@ def generateSurgeSubFile(account: Account = None,
     for i, config in enumerate(user_config):
         # random a name like 2FDEC93F, num and upper letter
         name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
+        country = GEOIP.lookup(config['self-ip'])
+        country_emoji = GEOIP.lookup_emoji(config['self-ip'])
+        proxy_name = f"{country_emoji} {country}-CF-{fake.color_name()}" if random_name else \
+            f"{country_emoji} {country}-CF-WARP-{i + 1}"
 
         surge_config[f'WireGuard {name}'] = config
-        surge_config['Proxy'][
-            f"{fake.emoji()} CF-{fake.color_name()}" if random_name else f"CF-WARP-{i + 1}"] = (f'wireguard, '
-                                                                                                f'section-name={name}')
+        surge_config['Proxy'][proxy_name] = f'wireguard, section-name={name}'
 
     surge_config['Proxy Group']['proxy'] = f"select, auto, fallback, {', '.join(surge_config['Proxy'].keys())}"
     surge_config['Proxy Group']['auto'] = (f"url-test, {', '.join(surge_config['Proxy'].keys())}, "

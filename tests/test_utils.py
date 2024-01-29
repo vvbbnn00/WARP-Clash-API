@@ -1,5 +1,6 @@
 import unittest
 
+from utils.geoip import GeoIP, countryCodeToEmoji
 from utils.proxy import getProxy
 from utils.wireguard import generateWireguardKeys
 from utils.entrypoints import *
@@ -22,6 +23,19 @@ class TestUtils(unittest.TestCase):
         entrypoints = getEntrypoints()
         self.assertTrue(entrypoints)
         self.assertTrue(len(entrypoints) > 0)
+
+    def test_GeoIP(self):
+        geoip = GeoIP('../config/geolite/GeoLite2-Country.mmdb')
+        country = geoip.lookup('8.8.8.8')
+        self.assertTrue(country)
+        self.assertEqual(country, "US")
+        self.assertEqual(countryCodeToEmoji(country), "🇺🇸")
+
+        countryNone = geoip.lookup('127.0.0.1')
+        self.assertFalse(countryNone)
+        self.assertEqual(countryCodeToEmoji(countryNone), "🌏")
+
+        geoip.close()
 
 
 if __name__ == '__main__':
