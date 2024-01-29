@@ -116,6 +116,9 @@
     </div>
 </form>
 <center>
+    <h2>自动判断订阅类型</h2>
+    <textarea id="autoSubscriptionLink" rows="1" readonly onclick="copyText('autoSubscriptionLink')"></textarea>
+    <div id="qrcode_auto"></div>
     <h2>Clash</h2>
     <textarea id="subscriptionLink" rows="1" readonly onclick="copyText('subscriptionLink')"></textarea>
     <div id="qrcode_clash"></div>
@@ -148,7 +151,7 @@
         const password = document.getElementById('passwordInput').value;
         const best = document.getElementById('alwaysBest').checked;
         const randomName = document.getElementById('randomName').checked;
-        const baseUrl = location.protocol + '//' + location.host + '/api/';
+        const baseUrl = location.protocol + '//' + location.host + '/';
         const queryParams = new URLSearchParams({
             best,
             randomName
@@ -158,16 +161,25 @@
             queryParams.append('key', password);
         }
 
-        document.getElementById('subscriptionLink').textContent = baseUrl + "clash?" + queryParams.toString();
-        document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "surge?" + queryParams.toString();
-        document.getElementById('WireguardLink').textContent = baseUrl + "wireguard?" + queryParams.toString();
-        document.getElementById('AccountLink').href = baseUrl + "account?" + queryParams.toString();
-        document.getElementById('onlyProxyLink').textContent = baseUrl + "only_proxies?" + queryParams.toString();
+        document.getElementById('autoSubscriptionLink').textContent = baseUrl + "sub?" + queryParams.toString();
+        document.getElementById('subscriptionLink').textContent = baseUrl + "api/clash?" + queryParams.toString();
+        document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "api/surge?" + queryParams.toString();
+        document.getElementById('WireguardLink').textContent = baseUrl + "api/wireguard?" + queryParams.toString();
+        document.getElementById('AccountLink').href = baseUrl + "api/account?" + queryParams.toString();
+        document.getElementById('onlyProxyLink').textContent = baseUrl + "api/only_proxies?" + queryParams.toString();
 
         const qrcodeContainerClash = document.getElementById('qrcode_clash');
         qrcodeContainerClash.innerHTML = '';
-        const qrcode = new QRCode(qrcodeContainerClash, {
+        const qrcodeClash = new QRCode(qrcodeContainerClash, {
             text: document.getElementById('subscriptionLink').textContent,
+            width: 200,
+            height: 200
+        });
+
+        const qrcodeContainerAuto = document.getElementById('qrcode_auto');
+        qrcodeContainerAuto.innerHTML = '';
+        const qrcodeAuto = new QRCode(qrcodeContainerAuto, {
+            text: document.getElementById('autoSubscriptionLink').textContent,
             width: 200,
             height: 200
         });

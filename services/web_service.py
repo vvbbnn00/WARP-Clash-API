@@ -84,6 +84,22 @@ def attachEndpoints(app: Flask):
     def httpIndex():
         return render_template('index.html')
 
+    @app.route('/sub', methods=['GET'])
+    def httpAutoSub():
+        user_agent = request.headers.get('User-Agent', 'unknown').lower()
+        # Automatically detect subscription type by user agent
+        if "clash" in user_agent:  # Clash
+            return httpSubscription("clash")
+        elif "shadowrocket" in user_agent:  # Shadowrocket
+            return httpSubscription("clash")
+        elif "quantumult" in user_agent:  # Quantumult
+            return httpSubscription("clash")
+        elif "surge" in user_agent:  # Surge
+            return httpSubscription("surge")
+
+        # By default, return Clash
+        return httpSubscription("clash")
+
     @app.route('/api/account', methods=['GET'])
     @rateLimit()
     @authorized()
