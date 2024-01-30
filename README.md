@@ -87,7 +87,7 @@ python3 app.py optimize
 | DELAY_THRESHOLD    | 500                               | 延迟阈值，超过该阈值的`IP`将被剔除                                                                 |
 | PROXY_POOL_URL     | `https://getproxy.bzpl.tech/get/` | IP代理池地址，用于刷取`WARP+`流量，您可以自行搭建，参照[proxy_pool](https://github.com/jhao104/proxy_pool) |
 | PUBLIC_URL         | 无                                 | 部署在公网上时，填写公网`IP`或域名，用于生成订阅链接，比如 `https://subs.zeabur.app`                           |
-| SURGE_SUBSCRIPTION_URL | /api/surge                     | 被托管的`Surge`配置文件的位置，默认为`api/surge`，即`http://你的IP:21001/api/surge` |
+| SURGE_SUBSCRIPTION_URL | /api/surge                     | 被托管的`Surge`配置文件的位置，即`http://你的IP:21001/api/surge` |
 
 ## 🗂️ 引用项目
 
