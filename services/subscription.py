@@ -185,6 +185,6 @@ def generateSurgeSubFile(account: Account = None,
         public_url = request.url_root[:-1]
 
     surge_ini = SURGE_SUB.replace("{PUBLIC_URL}",
-                                  f"{public_url}/api/surge?best={str(best).lower()}&randomName={str(random_name).lower()}") + surge_ini
+                                  f"{public_url}/surge") + surge_ini
 
     return surge_ini
