@@ -17,7 +17,7 @@ high-speed `WARP+` node without extra hassle!
 
 ## 💡 Key Features
 
-- 💻 Supports clients such as `Clash`, `Surge`, `Quantumult`, `Shadowrocket`, etc.
+- 💻 Supports clients such as `Clash`, `Surge`, `Shadowrocket`, etc.
 - 🌏 Supports IP optimization.
 - 🐋 Supports one-click deployment using `Docker compose`.
 - 📕 Automatically replenishes `WARP+` traffic, requests are proxied, preserving your IP from getting blocked.
