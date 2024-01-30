@@ -105,3 +105,9 @@ projects:
 - [warp-script](https://gitlab.com/Misaka-blog/warp-script)
 - [warp](https://replit.com/@aliilapro/warp)
 - [wgcf](https://github.com/ViRb3/wgcf)
+
+## 👥 The Instance deployed by Community
+
+- [https://tofree.zeabur.app](https://tofree.zeabur.app)
+
+A free WARP Clash API instance deployed by community.
