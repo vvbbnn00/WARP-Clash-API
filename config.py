@@ -10,3 +10,4 @@ PORT = int(os.environ.get('PORT')) if os.environ.get('PORT') else 3000
 HOST = os.environ.get('HOST') or '0.0.0.0'
 PROXY_POOL_URL = os.environ.get('PROXY_POOL_URL', 'https://getproxy.bzpl.tech/get/')
 PUBLIC_URL = os.environ.get('PUBLIC_URL') or None
+SURGE_SUBSCRIPTION_URL = os.environ.get('SURGE_SUBSCRIPTION_URL') or 'api/surge'
