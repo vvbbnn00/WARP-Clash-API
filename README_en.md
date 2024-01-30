@@ -96,7 +96,7 @@ Here are the available environment variables:
 | DELAY_THRESHOLD    | 500                               | Delay threshold; IPs exceeding this threshold will be removed.                                                                                                 |
 | PROXY_POOL_URL     | `https://getproxy.bzpl.tech/get/` | IP proxy pool address, used to get `WARP+` traffic. You can build it yourself, check [proxy_pool](https://github.com/jhao104/proxy_pool) for more information. |
 | PUBLIC_URL         | None                              | When deployed on the public network, fill in the public IP or domain name to generate subscription links. for example `https://subs.zeabur.app`                |
-| SURGE_SUBSCRIPTION_URL | /api/surge                     | The location of the hosted Surge configuration file, which by default is api/surge, i.e., `http://yourIP:21001/api/surge`. |
+| SURGE_SUBSCRIPTION_URL | /api/surge                     | The location of the hosted Surge configuration file, i.e., `http://yourIP:21001/api/surge`. |
 
 
 ## 🗂️ Attribution
