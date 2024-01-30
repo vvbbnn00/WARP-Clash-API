@@ -97,3 +97,9 @@ python3 app.py optimize
 - [wgcf](https://github.com/ViRb3/wgcf)
 - [proxy_pool](https://github.com/jhao104/proxy_pool)
 - [geolite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data)
+
+## 👥 社区部署的实例
+
+- [https://tofree.zeabur.app](https://tofree.zeabur.app)
+
+一个免费的 WARP Clash API 实例，由社区部署。
