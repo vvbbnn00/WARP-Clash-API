@@ -14,7 +14,7 @@
 
 ## 💡 特色功能
 
-- 💻 支持`Clash`、`Surge`、`Quantumult`、`Shadowrocket`等客户端
+- 💻 支持`Clash`、`Surge`、`Shadowrocket`等客户端
 - 🌏 支持`IP`选优
 - 🐋 支持`Docker compose`一键部署
 - 📕 全自动刷取`WARP+`流量，请求经过代理，防封`IP`
