@@ -13,6 +13,7 @@ from utils.entrypoints import getEntrypoints, getBestEntrypoints
 from flask import request
 
 from utils.geoip import GeoIP
+from utils.node_name import NodeNameGenerator
 
 CF_CONFIG = json.load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = json.load(open("./config/clash.json", "r", encoding="utf8"))
@@ -43,18 +44,18 @@ def generateClashSubFile(account: Account = None,
     entrypoints = getEntrypoints()
     random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
 
-    fake = Faker()
-
     # Generate user configuration file
     user_config = []
+
+    # Initialize NodeNameGenerator
+    node_name_generator = NodeNameGenerator(random_name)
 
     # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
     for i in range(len(random_points)):
         point = random_points[i]
         country = GEOIP.lookup(point.ip)
         country_emoji = GEOIP.lookup_emoji(point.ip)
-        name = f"{country_emoji} {country}-CF-{fake.color_name()}" if random_name else \
-            f"{country_emoji} {country}-CF-WARP-{i + 1}"
+        name = node_name_generator.next(country_emoji, country)
         user_config.append(
             {
                 "name": name,
@@ -129,8 +130,6 @@ def generateSurgeSubFile(account: Account = None,
     entrypoints = getEntrypoints()
     random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
 
-    fake = Faker()
-
     # Generate user configuration file
     user_config = []
 
@@ -149,13 +148,15 @@ def generateSurgeSubFile(account: Account = None,
 
     surge_config = copy.deepcopy(SURGE)
 
-    for i, config in enumerate(user_config):
+    # Initialize NodeNameGenerator
+    node_name_generator = NodeNameGenerator(random_name)
+
+    for config in user_config:
         # random a name like 2FDEC93F, num and upper letter
         name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
         country = GEOIP.lookup(config['self-ip'])
         country_emoji = GEOIP.lookup_emoji(config['self-ip'])
-        proxy_name = f"{country_emoji} {country}-CF-{fake.color_name()}" if random_name else \
-            f"{country_emoji} {country}-CF-WARP-{i + 1}"
+        proxy_name = node_name_generator.next(country_emoji, country)
 
         surge_config[f'WireGuard {name}'] = config
         surge_config['Proxy'][proxy_name] = f'wireguard, section-name={name}'
