@@ -1,5 +1,5 @@
 requests~=2.31.0
-cryptography==42.0.1
+cryptography==42.0.2
 Faker==22.5.1
 flask==3.0.1
 PyYAML~=6.0.1
