@@ -122,6 +122,10 @@
     <h2>Clash</h2>
     <textarea id="subscriptionLink" rows="1" readonly onclick="copyText('subscriptionLink')"></textarea>
     <div id="qrcode_clash"></div>
+    <h2>ShadowRocket</h2>
+    <textarea id="subShadowRocketSubscriptionLink" rows="1" readonly
+              onclick="copyText('subShadowRocketSubscriptionLink')"></textarea>
+    <div id="qrcode_sr"></div>
     <h2>Surge</h2>
     <textarea id="subSurgeScriptionLink" rows="1" readonly onclick="copyText('subSurgeScriptionLink')"></textarea>
     <h2>Wireguard</h2>
@@ -163,6 +167,7 @@
 
         document.getElementById('autoSubscriptionLink').textContent = baseUrl + "sub?" + queryParams.toString();
         document.getElementById('subscriptionLink').textContent = baseUrl + "api/clash?" + queryParams.toString();
+        document.getElementById('subShadowRocketSubscriptionLink').textContent = baseUrl + "api/shadowrocket?" + queryParams.toString();
         document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "api/surge?" + queryParams.toString();
         document.getElementById('WireguardLink').textContent = baseUrl + "api/wireguard?" + queryParams.toString();
         document.getElementById('AccountLink').href = baseUrl + "api/account?" + queryParams.toString();
@@ -180,6 +185,14 @@
         qrcodeContainerAuto.innerHTML = '';
         const qrcodeAuto = new QRCode(qrcodeContainerAuto, {
             text: document.getElementById('autoSubscriptionLink').textContent,
+            width: 200,
+            height: 200
+        });
+
+        const qrcodeContainerSr = document.getElementById('qrcode_sr');
+        qrcodeContainerSr.innerHTML = '';
+        const qrcodeSr = new QRCode(qrcodeContainerSr, {
+            text: document.getElementById('subShadowRocketSubscriptionLink').textContent,
             width: 200,
             height: 200
         });

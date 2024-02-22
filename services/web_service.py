@@ -3,7 +3,8 @@ from functools import wraps
 
 from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
-from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile
+from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
+    generateShadowRocketSubFile
 from services.common import *
 from faker import Faker
 
@@ -91,7 +92,9 @@ def attachEndpoints(app: Flask):
         if "clash" in user_agent:  # Clash
             return httpSubscription("clash")
         elif "shadowrocket" in user_agent:  # Shadowrocket
-            return httpSubscription("clash")
+            return httpSubscription("shadowrocket")
+        elif "v2ray" in user_agent:  # V2Ray
+            return httpSubscription("shadowrocket")
         elif "quantumult" in user_agent:  # Quantumult
             return httpSubscription("clash")
         elif "surge" in user_agent:  # Surge
@@ -138,6 +141,14 @@ def attachEndpoints(app: Flask):
             headers = {
                 'Content-Type': 'text/plain; charset=utf-8',
                 'Content-Disposition': 'attachment; filename=surge.conf',
+                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
+                                         f"expire=253388144714"
+            }
+        elif sub_type == 'shadowrocket':  # Shadowrocket
+            fileData = generateShadowRocketSubFile(account, logger, best=best, random_name=random_name)
+            headers = {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Content-Disposition': 'attachment; filename=Shadowrocket.txt',
                 "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
                                          f"expire=253388144714"
             }

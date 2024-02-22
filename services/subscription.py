@@ -1,10 +1,11 @@
+import base64
 import configparser
 import copy
 import json
 import random
 import string
 import tempfile
-
+import urllib.parse
 import yaml
 from flask import request
 
@@ -191,3 +192,39 @@ def generateSurgeSubFile(account: Account = None,
     surge_ini = SURGE_SUB.replace("{PUBLIC_URL}", public_url) + surge_ini
 
     return surge_ini
+
+
+def generateShadowRocketSubFile(account: Account = None,
+                                logger=logging.getLogger(__name__),
+                                best=False,
+                                random_name=False):
+    """
+    Generate ShadowRocket subscription file
+    :param account:
+    :param logger:
+    :param best: Whether to use the best entrypoints
+    :param random_name: Whether to use random name
+    :return:
+    """
+    account = getCurrentAccount(logger) if account is None else account
+    entrypoints = getEntrypoints()
+    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
+
+    # Initialize NodeNameGenerator
+    node_name_generator = NodeNameGenerator(random_name)
+
+    url_list = []
+    # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
+    for i in range(len(random_points)):
+        point = random_points[i]
+        country = GEOIP.lookup(point.ip)
+        country_emoji = GEOIP.lookup_emoji(point.ip)
+        name = node_name_generator.next(country_emoji, country)
+        url = f"wg://{point.ip}:{point.port}?publicKey={CF_CONFIG.get('publicKey')}&privateKey={account.private_key}" \
+              f"&ip=172.16.0.2&udp=1&flag={country}#{urllib.parse.quote(name)}"
+        url_list.append(url)
+
+    sub_data = "\n".join(url_list)
+    sub_data = base64.b64encode(sub_data.encode("utf-8")).decode("utf-8")
+
+    return sub_data
