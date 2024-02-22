@@ -29,12 +29,12 @@ GEOIP = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
 def generateClashSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
                          best=False,
-                         only_proxies=False,
+                         proxy_format='full',
                          random_name=False):
     """
     Generate Clash subscription file
     :param random_name: Whether to use random name
-    :param only_proxies: If this is True, only generate proxies
+    :param proxy_format: full - full config, with_groups - only proxies and proxy-groups, only_proxies - only proxies
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
@@ -74,8 +74,12 @@ def generateClashSubFile(account: Account = None,
         proxy_group["proxies"] += [proxy["name"] for proxy in user_config]
 
     # Generate YAML file
-    if only_proxies:
-        clash_yaml = yaml.dump({'proxies': clash_json['proxies'], 'proxy-groups': clash_json['proxy-groups']},
+    if proxy_format == 'only_proxies':
+        clash_yaml = yaml.dump({'proxies': clash_json['proxies']},
+                               allow_unicode=True)
+    elif proxy_format == 'with_groups':
+        clash_yaml = yaml.dump({'proxies': clash_json['proxies'],
+                                'proxy-groups': clash_json['proxy-groups']},
                                allow_unicode=True)
     else:
         clash_yaml = yaml.dump(clash_json, allow_unicode=True)
@@ -115,12 +119,12 @@ PersistentKeepalive = 25
 def generateSurgeSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
                          best=False,
-                         only_proxies=False,
+                         proxy_format='full',
                          random_name=False):
     """
     Generate Surge subscription file
     :param random_name: Whether to use random name
-    :param only_proxies: If this is True, only generate proxies
+    :param proxy_format: full - full config, with_groups - only proxies and proxy-groups, only_proxies - only proxies
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
@@ -174,7 +178,7 @@ def generateSurgeSubFile(account: Account = None,
     surge_ini = temp_file.read()
 
     # Generate INI file
-    if only_proxies:
+    if proxy_format == 'with_groups' or proxy_format == 'only_proxies':
         pass
     else:
         surge_ini += SURGE_RULE
