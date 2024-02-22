@@ -27,14 +27,17 @@ endpointyx(){
         awk -F, '$3!="timeout ms" {print}' | 
         sort -t, -nk2 -nk3 | 
         uniq | 
-        head -11 |
-        awk -F, '{print "端点 "$1" 丢包率 "$2" 平均延迟 "$3}'
+        head -11
     }
 
-    if [ -d /app/config ]; then
-        process_result_csv < /app/config/result.csv
+    # 优选结果处理
+    process_result_csv < result.csv
+
+    # 将优选结果移动到指定目录
+    if [ -n "$RUN_IN_DOCKER" ]; then
+      mv -f result.csv /app/config/result.csv
     else
-        process_result_csv < ./config/result.csv  
+      mv -f result.csv ./config/result.csv
     fi
 
     # 删除 WARP Endpoint IP 优选工具及其附属文件

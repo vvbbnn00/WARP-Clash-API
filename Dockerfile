@@ -15,4 +15,6 @@ RUN apk add --no-cache bash build-base libffi-dev openssl-dev
 RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.ustc.edu.cn/pypi/web/simple
 RUN chmod +x ./scripts/*.sh
 
+ENV RUN_IN_DOCKER=true
+
 CMD ["/bin/sh", "./scripts/run.sh"]
