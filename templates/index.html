@@ -59,8 +59,10 @@
             border: none;
             text-align: center;
             width: 100%;
+            max-width: 500px;
             font-size: 16px;
             margin-bottom: 10px;
+            word-break: break-all;
         }
 
         textarea:focus {
@@ -101,10 +103,10 @@
 </div>
 
 <h1>WARP Clash 订阅地址生成器</h1>
-<form>
+<form action="javascript:generateLink()">
     <div>
         <label for="passwordInput"></label>
-        <input type="password" id="passwordInput" placeholder="输入您的SECRET_KEY" oninput="generateLink()">
+        <input type="password" name="password" id="passwordInput" placeholder="输入您的SECRET_KEY">
     </div>
     <div>
         <label>
@@ -114,30 +116,32 @@
             <input type="checkbox" id="randomName" onchange="generateLink()" checked> 随机节点名称
         </label>
     </div>
+    <div>
+        <br/>
+        <label for="proxyFormat">订阅格式：</label>
+        <select id="proxyFormat" onchange="generateLink()">
+            <option value="full">完整订阅</option>
+            <option value="with_groups">Proxies & Proxy Groups</option>
+            <option value="only_proxies">仅包含Proxies</option>
+        </select>
+    </div>
 </form>
 <center>
     <h2>自动判断订阅类型</h2>
-    <textarea id="autoSubscriptionLink" rows="1" readonly onclick="copyText('autoSubscriptionLink')"></textarea>
+    <textarea id="autoSubscriptionLink" rows="3" readonly onclick="copyText('autoSubscriptionLink')"></textarea>
     <div id="qrcode_auto"></div>
     <h2>Clash</h2>
-    <textarea id="subscriptionLink" rows="1" readonly onclick="copyText('subscriptionLink')"></textarea>
+    <textarea id="subscriptionLink" rows="3" readonly onclick="copyText('subscriptionLink')"></textarea>
     <div id="qrcode_clash"></div>
     <h2>ShadowRocket</h2>
-    <textarea id="subShadowRocketSubscriptionLink" rows="1" readonly
+    <textarea id="subShadowRocketSubscriptionLink" rows="3" readonly
               onclick="copyText('subShadowRocketSubscriptionLink')"></textarea>
     <div id="qrcode_sr"></div>
     <h2>Surge</h2>
-    <textarea id="subSurgeScriptionLink" rows="1" readonly onclick="copyText('subSurgeScriptionLink')"></textarea>
+    <textarea id="subSurgeScriptionLink" rows="3" readonly onclick="copyText('subSurgeScriptionLink')"></textarea>
     <h2>Wireguard</h2>
-    <textarea id="WireguardLink" rows="1" readonly onclick="copyText('WireguardLink')"></textarea>
+    <textarea id="WireguardLink" rows="3" readonly onclick="copyText('WireguardLink')"></textarea>
     <div id="qrcode_wg"></div>
-    <h2>Only Proxies & Proxies Group</h2>
-    <div class="tip">
-        该链接仅包含节点信息，不包含规则信息，适用于自定义规则的用户。
-    </div>
-    <textarea id="onlyProxyLink" rows="1" readonly onclick="copyText('onlyProxyLink')"></textarea>
-    <a onclick="getOnlyProxy()" href="javascript:">点击复制节点信息</a>
-    <textarea id="onlyProxyInfo" rows="0" style="height: 0; width: 0;"></textarea>
     <h2>账户信息</h2>
     <a href="#" title="账户信息" target="_blank" id="AccountLink">点击查看</a>
 </center>
@@ -155,10 +159,12 @@
         const password = document.getElementById('passwordInput').value;
         const best = document.getElementById('alwaysBest').checked;
         const randomName = document.getElementById('randomName').checked;
+        const proxyFormat = document.getElementById('proxyFormat').value;
         const baseUrl = location.protocol + '//' + location.host + '/';
         const queryParams = new URLSearchParams({
             best,
-            randomName
+            randomName,
+            proxyFormat
         });
 
         if (password.length) {
@@ -171,7 +177,6 @@
         document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "api/surge?" + queryParams.toString();
         document.getElementById('WireguardLink').textContent = baseUrl + "api/wireguard?" + queryParams.toString();
         document.getElementById('AccountLink').href = baseUrl + "api/account?" + queryParams.toString();
-        document.getElementById('onlyProxyLink').textContent = baseUrl + "api/only_proxies?" + queryParams.toString();
 
         const qrcodeContainerClash = document.getElementById('qrcode_clash');
         qrcodeContainerClash.innerHTML = '';
@@ -215,18 +220,6 @@
         setTimeout(() => {
             toast.classList.remove('show');
         }, 1000);
-    }
-
-    function getOnlyProxy() {
-        const url = document.getElementById('onlyProxyLink').textContent;
-        fetch(url, {
-            method: 'GET',
-        }).then(res => res.text()).then(res => {
-            document.getElementById('onlyProxyInfo').textContent = res;
-            copyText('onlyProxyInfo');
-        }).catch(err => {
-            showToast(`Error ${err.status}: ${err.statusText}`)
-        });
     }
 
     function getQrCodeWg() {

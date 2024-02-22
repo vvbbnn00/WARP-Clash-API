@@ -121,9 +121,14 @@ def attachEndpoints(app: Flask):
         account = getCurrentAccount(logger)
         best = request.args.get('best', 'false').lower() == "true" or False
         random_name = request.args.get('randomName', 'false').lower() == "true" or False
+        proxy_format = request.args.get('proxyFormat', 'full').lower()
 
         if sub_type == "clash":  # Clash
-            fileData = generateClashSubFile(account, logger, best=best, only_proxies=False, random_name=random_name)
+            fileData = generateClashSubFile(account,
+                                            logger,
+                                            best=best,
+                                            proxy_format=proxy_format,
+                                            random_name=random_name)
             headers = {
                 'Content-Type': 'application/x-yaml; charset=utf-8',
                 'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
@@ -137,7 +142,11 @@ def attachEndpoints(app: Flask):
                 'Content-Disposition': f'attachment; filename={fake.lexify("????????????").lower()}.conf'
             }
         elif sub_type == "surge":  # Surge
-            fileData = generateSurgeSubFile(account, logger, best=best, random_name=random_name)
+            fileData = generateSurgeSubFile(account,
+                                            logger,
+                                            best=best,
+                                            random_name=random_name,
+                                            proxy_format=proxy_format)
             headers = {
                 'Content-Type': 'text/plain; charset=utf-8',
                 'Content-Disposition': 'attachment; filename=surge.conf',
@@ -152,8 +161,10 @@ def attachEndpoints(app: Flask):
                 "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
                                          f"expire=253388144714"
             }
+        # This might be deprecated in the future.
         elif sub_type == "only_proxies":  # Only proxies
-            fileData = generateClashSubFile(account, logger, best=best, only_proxies=True, random_name=random_name)
+            fileData = generateClashSubFile(account, logger, best=best, proxy_format='with_groups',
+                                            random_name=random_name)
             headers = {
                 'Content-Type': 'application/x-yaml; charset=utf-8',
                 'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
