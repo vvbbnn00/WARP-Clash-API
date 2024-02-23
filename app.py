@@ -1,8 +1,8 @@
 import argparse
-import os
 import sys
 
 from config import PORT, HOST
+from utils.entrypoints import optimizeEntrypoints
 from utils.logger import createLogger
 
 
@@ -71,17 +71,7 @@ def main():
         if sys.platform == 'win32':
             print('This command is not supported on Windows.')
             return
-
-        # Fix ./scripts/get_entrypoint.sh if it has CRLF
-        file = open('./scripts/get_entrypoints.sh', 'r')
-        data = file.read().replace('\r\n', '\n')
-        file.close()
-        file = open('./scripts/get_entrypoints.sh', 'w')
-        file.write(data)
-        file.close()
-
-        # Run ./scripts/get_entrypoint.sh
-        os.system("bash ./scripts/get_entrypoints.sh")
+        optimizeEntrypoints()
 
 
 if __name__ == "__main__":
