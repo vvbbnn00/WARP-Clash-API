@@ -1,9 +1,11 @@
 import logging
+import sys
 import time
 
 from models import Account
 from services.cloudflare import register
 from services.common import getCurrentAccount
+from utils.entrypoints import optimizeEntrypoints
 from utils.wireguard import generateWireguardKeys
 from services.cloudflare import getAccount
 from utils.proxy import getProxy
@@ -56,6 +58,26 @@ def saveAccount(account: Account = None, logger=logging.Logger(__name__)):
     logger.info(f"Save account to file")
     account.save()
 
+
+def reoptimizeEntryPoints(logger=logging.Logger(__name__)):
+    """
+    Reoptimize entrypoints
+    :param logger:
+    :return:
+    """
+    if sys.platform == "win32":
+        logger.warning(f"Reoptimize is not supported on Windows.")
+        return
+
+    logger.info(f"Start reoptimize entrypoints.")
+
+    try:
+        optimizeEntrypoints()
+    except Exception as e:
+        logger.error(f"Failed to reoptimize entrypoints.")
+        logger.error(f"{e}")
+
+    logger.info(f"Reoptimize entrypoints finished.")
 
 # if __name__ == '__main__':
 #     privkey, pubkey = generate_wireguard_keys()
