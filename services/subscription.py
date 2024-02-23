@@ -65,8 +65,10 @@ def generateClashSubFile(account: Account = None,
                 "ip": "172.16.0.2",
                 "private-key": account.private_key,
                 "public-key": CF_CONFIG.get("publicKey"),
-                "remote-dns-resolve": False,
-                "udp": False
+                "udp": True,
+                "remote-dns-resolve": True,
+                "dns": ['1.1.1.1', '1.0.0.1'],
+                "mtu": 1280,
             })
     clash_json = copy.deepcopy(CLASH)
     clash_json["proxies"] = user_config
@@ -225,6 +227,7 @@ def generateShadowRocketSubFile(account: Account = None,
         country_emoji = GEOIP.lookup_emoji(point.ip)
         name = node_name_generator.next(country_emoji, country)
         url = f"wg://{point.ip}:{point.port}?publicKey={CF_CONFIG.get('publicKey')}&privateKey={account.private_key}" \
+              f"&dns=1.1.1.1,1.0.0.1" \
               f"&ip=172.16.0.2&udp=1&flag={country}#{urllib.parse.quote(name)}"
         url_list.append(url)
 
