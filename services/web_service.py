@@ -2,7 +2,8 @@ import time
 from functools import wraps
 
 from flask import Flask, request, make_response, current_app, render_template
-from config import SECRET_KEY, REQUEST_RATE_LIMIT
+from config import SECRET_KEY, REQUEST_RATE_LIMIT, SHARE_SUBSCRIPTION
+from services.account import resetAccountKey, doUpdateLicenseKey
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
     generateShadowRocketSubFile
 from services.common import *
@@ -11,15 +12,19 @@ from faker import Faker
 RATE_LIMIT_MAP = {}
 
 
-def authorized():
+def authorized(can_skip: bool = False):
     """
     All requests must be authorized
+    :param can_skip: If true, the request can skip authorization when SHARE_SUBSCRIPTION is true
     :return:
     """
 
     def decorator(f):
         @wraps(f)
         def decoratedFunction(*args, **kwargs):
+            # Skip authorization if the route can be shared
+            if SHARE_SUBSCRIPTION and can_skip:
+                return f(*args, **kwargs)
 
             key = request.headers.get('X-Api-Key') or request.args.get('key')
 
@@ -114,9 +119,47 @@ def attachEndpoints(app: Flask):
             'data': account.__dict__
         }
 
-    @app.route('/api/<string:sub_type>', methods=['GET'])
+    @app.route('/api/account/reset_key', methods=['POST'])
     @rateLimit()
     @authorized()
+    def httpAccountResetKey():
+        try:
+            resetAccountKey(logger)
+        except Exception as e:
+            return {
+                'code': 500,
+                'message': str(e)
+            }, 500
+        return {
+            'code': 200,
+            'message': 'ok'
+        }
+
+    @app.route('/api/account/update_license', methods=['POST'])
+    @rateLimit()
+    @authorized()
+    def httpAccountUpdateLicense():
+        license_key = request.json.get('license_key')
+        if not license_key:
+            return {
+                'code': 400,
+                'message': 'License key is required'
+            }, 400
+        try:
+            doUpdateLicenseKey(license_key, logger)
+        except Exception as e:
+            return {
+                'code': 500,
+                'message': str(e)
+            }, 500
+        return {
+            'code': 200,
+            'message': 'ok'
+        }
+
+    @app.route('/api/<string:sub_type>', methods=['GET'])
+    @rateLimit()
+    @authorized(can_skip=True)
     def httpSubscription(sub_type: str):
         account = getCurrentAccount(logger)
         best = request.args.get('best', 'false').lower() == "true" or False
