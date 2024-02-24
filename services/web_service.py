@@ -3,6 +3,7 @@ from functools import wraps
 
 from flask import Flask, request, make_response, current_app, render_template
 from config import SECRET_KEY, REQUEST_RATE_LIMIT
+from services.account import resetAccountKey, doUpdateLicenseKey
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
     generateShadowRocketSubFile
 from services.common import *
@@ -112,6 +113,44 @@ def attachEndpoints(app: Flask):
             'code': 200,
             'message': 'ok',
             'data': account.__dict__
+        }
+
+    @app.route('/api/account/reset_key', methods=['POST'])
+    @rateLimit()
+    @authorized()
+    def httpAccountResetKey():
+        try:
+            resetAccountKey(logger)
+        except Exception as e:
+            return {
+                'code': 500,
+                'message': str(e)
+            }, 500
+        return {
+            'code': 200,
+            'message': 'ok'
+        }
+
+    @app.route('/api/account/update_license', methods=['POST'])
+    @rateLimit()
+    @authorized()
+    def httpAccountUpdateLicense():
+        license_key = request.json.get('license_key')
+        if not license_key:
+            return {
+                'code': 400,
+                'message': 'License key is required'
+            }, 400
+        try:
+            doUpdateLicenseKey(license_key, logger)
+        except Exception as e:
+            return {
+                'code': 500,
+                'message': str(e)
+            }, 500
+        return {
+            'code': 200,
+            'message': 'ok'
         }
 
     @app.route('/api/<string:sub_type>', methods=['GET'])
