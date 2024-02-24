@@ -11,3 +11,4 @@ RANDOM_COUNT = int(os.environ.get('RANDOM_COUNT')) if os.environ.get('RANDOM_COU
 REOPTIMIZE_INTERVAL = int(os.environ.get('REOPTIMIZE_INTERVAL', -1))
 REQUEST_RATE_LIMIT = int(os.environ.get('REQUEST_RATE_LIMIT')) if os.environ.get('REQUEST_RATE_LIMIT') else 0
 SECRET_KEY = os.environ.get('SECRET_KEY') or None
+SHARE_SUBSCRIPTION = os.environ.get('SHARE_SUBSCRIPTION', 'false').lower() == 'true'
