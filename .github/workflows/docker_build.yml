@@ -41,6 +41,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: GITHUB_ACTIONS=true
+          platforms: linux/amd64,linux/arm64
 
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
