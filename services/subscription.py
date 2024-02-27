@@ -27,6 +27,30 @@ SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
 GEOIP = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
 
 
+def getRandomEntryPoints(best=False,
+                         logger=logging.getLogger(__name__)):
+    """
+    Get random entry points
+    :param best: Whether to use the best entrypoints
+    :param logger:
+    :return: list of entrypoints
+    """
+    entrypoints = getEntrypoints()
+
+    # If there is no entrypoints, return a message
+    if entrypoints is None or len(entrypoints) == 0:
+        return None, "No entrypoints available. Please try again later."
+
+    # Randomly select entrypoints
+    if len(entrypoints) < RANDOM_COUNT:
+        logger.warning(f"Entrypoints is less than {RANDOM_COUNT}, only {len(entrypoints)} available.")
+        random_points = entrypoints
+    else:
+        random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
+
+    return random_points, ""
+
+
 def generateClashSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
                          best=False,
@@ -44,8 +68,10 @@ def generateClashSubFile(account: Account = None,
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = getEntrypoints()
-    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
+
+    random_points, msg = getRandomEntryPoints(best, logger)
+    if random_points is None:
+        return msg
 
     # Generate user configuration file
     user_config = []
@@ -107,6 +133,11 @@ def generateWireguardSubFile(account: Account = None,
     """
     account = getCurrentAccount(logger) if account is None else account
     entrypoints = getEntrypoints()
+
+    # If there is no entrypoints, return a message
+    if entrypoints is None or len(entrypoints) == 0:
+        return "No entrypoints available. Please try again later."
+
     random_point = random.choice(entrypoints) if not best else getBestEntrypoints(1)[0]
 
     # Generate user configuration file
@@ -140,8 +171,10 @@ def generateSurgeSubFile(account: Account = None,
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = getEntrypoints()
-    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
+
+    random_points, msg = getRandomEntryPoints(best, logger)
+    if random_points is None:
+        return msg
 
     # Generate user configuration file
     user_config = []
@@ -220,8 +253,10 @@ def generateShadowRocketSubFile(account: Account = None,
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = getEntrypoints()
-    random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
+
+    random_points, msg = getRandomEntryPoints(best, logger)
+    if random_points is None:
+        return msg
 
     # Initialize NodeNameGenerator
     node_name_generator = NodeNameGenerator(random_name)
