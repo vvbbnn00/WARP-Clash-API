@@ -6,6 +6,7 @@ import random
 import string
 import tempfile
 import urllib.parse
+
 import yaml
 from flask import request
 
@@ -30,7 +31,8 @@ def generateClashSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
                          best=False,
                          proxy_format='full',
-                         random_name=False):
+                         random_name=False,
+                         is_android=False):
     """
     Generate Clash subscription file
     :param random_name: Whether to use random name
@@ -38,6 +40,7 @@ def generateClashSubFile(account: Account = None,
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
+    :param is_android: Whether the client is Android
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
@@ -56,20 +59,24 @@ def generateClashSubFile(account: Account = None,
         country = GEOIP.lookup(point.ip)
         country_emoji = GEOIP.lookup_emoji(point.ip)
         name = node_name_generator.next(country_emoji, country)
-        user_config.append(
-            {
-                "name": name,
-                "type": "wireguard",
-                "server": point.ip,
-                "port": point.port,
-                "ip": "172.16.0.2",
-                "private-key": account.private_key,
-                "public-key": CF_CONFIG.get("publicKey"),
-                "udp": True,
-                "remote-dns-resolve": True,
-                "dns": ['1.1.1.1', '1.0.0.1'],
-                "mtu": 1280,
-            })
+        config_data = {
+            "name": name,
+            "type": "wireguard",
+            "server": point.ip,
+            "port": point.port,
+            "ip": "172.16.0.2",
+            "private-key": account.private_key,
+            "public-key": CF_CONFIG.get("publicKey"),
+            "udp": True,
+            "remote-dns-resolve": True,
+            "mtu": 1280,
+        }
+
+        # It seems that `dns` will cause problem in android.
+        if not is_android:
+            config_data["dns"] = ['1.1.1.1', '1.0.0.1']
+
+        user_config.append(config_data)
     clash_json = copy.deepcopy(CLASH)
     clash_json["proxies"] = user_config
     for proxy_group in clash_json["proxy-groups"]:
