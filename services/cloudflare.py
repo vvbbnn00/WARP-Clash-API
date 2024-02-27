@@ -122,13 +122,14 @@ def getAccount(account: Account, proxy=None) -> dict:
     return data["account"]
 
 
-def updateLicenseKey(account: Account, license_key: str, proxy=None) -> dict:
+def updateLicenseKey(account: Account, license_key: str, proxy=None, logger=None) -> dict:
     """
     Update license key
 
     :param account: account
     :param license_key: license key
     :param proxy: proxy dict
+    :param logger: logger
     :return:
     """
     timestamp = datetime.datetime.now().isoformat()[:-3] + "Z"
@@ -141,6 +142,10 @@ def updateLicenseKey(account: Account, license_key: str, proxy=None) -> dict:
     response = SESSION.put(f"{API_URL}/{API_VERSION}/reg/{account.account_id}/account",
                            headers={"Authorization": f"Bearer {account.token}"},
                            json=data, proxies=proxy)
+
+    if response.status_code >= 400:
+        if logger:
+            logger.error(f"Failed to update license key, response: {response.text}")
 
     response.raise_for_status()
 
@@ -181,4 +186,3 @@ def getClientConfig(proxy=None) -> dict:
     response.raise_for_status()
 
     return response.json()["result"]
-

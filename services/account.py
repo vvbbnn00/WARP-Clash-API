@@ -46,7 +46,7 @@ def doUpdateLicenseKey(license_key: str, logger=logging.Logger(__name__)):
         return
 
     # Update license key
-    updateLicenseKey(account, license_key)
+    updateLicenseKey(account, license_key, logger=logger)
 
     # Save changes to account
     account.license_key = license_key
