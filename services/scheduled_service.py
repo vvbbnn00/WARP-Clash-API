@@ -3,7 +3,7 @@ import time
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from config import DO_GET_WARP_DATA, REOPTIMIZE_INTERVAL
+from config import DO_GET_WARP_DATA, REOPTIMIZE_INTERVAL, GET_WARP_DATA_INTERVAL
 from services.tasks import doAddDataTaskOnce, saveAccount, reoptimizeEntryPoints
 
 
@@ -19,9 +19,14 @@ def main(logger=None):
     scheduler = BackgroundScheduler()
     logger.info(f"Start scheduler.")
 
-    if DO_GET_WARP_DATA:
-        logger.info(f"DO_GET_WARP_DATA is True, will fetch WARP data per 18 seconds.")
-        scheduler.add_job(doAddDataTaskOnce, 'interval', seconds=18, args=[None, logger])
+    if DO_GET_WARP_DATA and GET_WARP_DATA_INTERVAL > 0:
+        logger.info(f"DO_GET_WARP_DATA is True, will fetch WARP data per {GET_WARP_DATA_INTERVAL} seconds.")
+
+        # Check if the GET_WARP_DATA_INTERVAL is too small
+        if GET_WARP_DATA_INTERVAL < 18:
+            logger.warning("To avoid 429 error, GET_WARP_DATA_INTERVAL is recommended to be set larger than 18")
+
+        scheduler.add_job(doAddDataTaskOnce, 'interval', seconds=GET_WARP_DATA_INTERVAL, args=[None, logger])
 
     if REOPTIMIZE_INTERVAL > 0:
         if sys.platform == "win32":

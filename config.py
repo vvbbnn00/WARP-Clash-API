@@ -2,6 +2,7 @@ import os
 
 DELAY_THRESHOLD = int(os.environ.get('DELAY_THRESHOLD')) if os.environ.get('DELAY_THRESHOLD') else 500
 DO_GET_WARP_DATA = os.environ.get('DO_GET_WARP_DATA', 'true').lower() == 'true'
+GET_WARP_DATA_INTERVAL = int(os.environ.get('GET_WARP_DATA_INTERVAL', 18))
 HOST = os.environ.get('HOST') or '0.0.0.0'
 LOSS_THRESHOLD = int(os.environ.get('LOSS_THRESHOLD')) if os.environ.get('LOSS_THRESHOLD') else 10
 PORT = int(os.environ.get('PORT')) if os.environ.get('PORT') else 3000
