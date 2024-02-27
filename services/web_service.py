@@ -1,13 +1,14 @@
 import time
 from functools import wraps
 
+from faker import Faker
 from flask import Flask, request, make_response, current_app, render_template
+
 from config import SECRET_KEY, REQUEST_RATE_LIMIT, SHARE_SUBSCRIPTION
 from services.account import resetAccountKey, doUpdateLicenseKey
+from services.common import *
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
     generateShadowRocketSubFile
-from services.common import *
-from faker import Faker
 
 RATE_LIMIT_MAP = {}
 
@@ -161,17 +162,25 @@ def attachEndpoints(app: Flask):
     @rateLimit()
     @authorized(can_skip=True)
     def httpSubscription(sub_type: str):
+        user_agent = request.headers.get('User-Agent', 'unknown').lower()
         account = getCurrentAccount(logger)
         best = request.args.get('best', 'false').lower() == "true" or False
         random_name = request.args.get('randomName', 'false').lower() == "true" or False
         proxy_format = request.args.get('proxyFormat', 'full').lower()
 
         if sub_type == "clash":  # Clash
+
+            # It seems that `dns` will cause problem in android.
+            # So it is necessary to check if the user agent contains "android".
+            # https://github.com/vvbbnn00/WARP-Clash-API/issues/74
+            is_android = "android" in user_agent
+
             fileData = generateClashSubFile(account,
                                             logger,
                                             best=best,
                                             proxy_format=proxy_format,
-                                            random_name=random_name)
+                                            random_name=random_name,
+                                            is_android=is_android)
             headers = {
                 'Content-Type': 'application/x-yaml; charset=utf-8',
                 'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
