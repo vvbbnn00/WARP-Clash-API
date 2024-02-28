@@ -115,6 +115,9 @@
         <label>
             <input type="checkbox" id="randomName" onchange="generateLink()" checked> 随机节点名称
         </label>
+        <label>
+            <input type="checkbox" id="ipv6" onchange="generateLink()"> IPv6
+        </label>
     </div>
     <div>
         <br/>
@@ -160,11 +163,13 @@
         const best = document.getElementById('alwaysBest').checked;
         const randomName = document.getElementById('randomName').checked;
         const proxyFormat = document.getElementById('proxyFormat').value;
+        const ipv6 = document.getElementById('ipv6').checked;
         const baseUrl = location.protocol + '//' + location.host + '/';
         const queryParams = new URLSearchParams({
             best,
             randomName,
-            proxyFormat
+            proxyFormat,
+            ipv6
         });
 
         if (password.length) {

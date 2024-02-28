@@ -24,7 +24,7 @@ from config import SECRET_KEY, REQUEST_RATE_LIMIT, SHARE_SUBSCRIPTION
 from services.account import resetAccountKey, doUpdateLicenseKey
 from services.common import *
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
-    generateShadowRocketSubFile
+    generateShadowRocketSubFile, generateSingBoxSubFile
 
 RATE_LIMIT_MAP = {}
 
@@ -121,6 +121,8 @@ def attachEndpoints(app: Flask):
             return httpSubscription("clash")
         elif "surge" in user_agent:  # Surge
             return httpSubscription("surge")
+        elif "sing-box" in user_agent:  # Sing Box
+            return httpSubscription("sing-box")
 
         # By default, return Clash
         return httpSubscription("clash")
@@ -183,6 +185,13 @@ def attachEndpoints(app: Flask):
         best = request.args.get('best', 'false').lower() == "true" or False
         random_name = request.args.get('randomName', 'false').lower() == "true" or False
         proxy_format = request.args.get('proxyFormat', 'full').lower()
+        ipv6 = request.args.get('ipv6', 'false').lower() == "true" or False
+
+        headers = {
+            'Content-Type': 'application/x-yaml; charset=utf-8',
+            "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
+                                     f"expire=253388144714"
+        }
 
         if sub_type == "clash":  # Clash
 
@@ -191,61 +200,65 @@ def attachEndpoints(app: Flask):
             # https://github.com/vvbbnn00/WARP-Clash-API/issues/74
             is_android = "android" in user_agent
 
-            fileData = generateClashSubFile(account,
-                                            logger,
-                                            best=best,
-                                            proxy_format=proxy_format,
-                                            random_name=random_name,
-                                            is_android=is_android)
-            headers = {
-                'Content-Type': 'application/x-yaml; charset=utf-8',
-                'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
-                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
-                                         f"expire=253388144714"
-            }
+            file_data = generateClashSubFile(account,
+                                             logger,
+                                             best=best,
+                                             proxy_format=proxy_format,
+                                             random_name=random_name,
+                                             is_android=is_android,
+                                             ipv6=ipv6)
+            file_name = f'Clash-{fake.color_name()}.yaml'
+
         elif sub_type == "wireguard":  # Wireguard
-            fileData = generateWireguardSubFile(account, logger, best=best)
-            headers = {
-                'Content-Type': 'application/x-conf; charset=utf-8',
-                'Content-Disposition': f'attachment; filename={fake.lexify("????????????").lower()}.conf'
-            }
+            file_data = generateWireguardSubFile(account,
+                                                 logger,
+                                                 best=best,
+                                                 ipv6=ipv6)
+            file_name = f'WireGuard-{fake.lexify("????????????").lower()}.conf'
+
         elif sub_type == "surge":  # Surge
-            fileData = generateSurgeSubFile(account,
-                                            logger,
-                                            best=best,
-                                            random_name=random_name,
-                                            proxy_format=proxy_format)
-            headers = {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Content-Disposition': 'attachment; filename=surge.conf',
-                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
-                                         f"expire=253388144714"
-            }
+            file_data = generateSurgeSubFile(account,
+                                             logger,
+                                             best=best,
+                                             random_name=random_name,
+                                             proxy_format=proxy_format,
+                                             ipv6=ipv6)
+            file_name = f'Surge-{fake.color_name()}.conf'
+
         elif sub_type == 'shadowrocket':  # Shadowrocket
-            fileData = generateShadowRocketSubFile(account, logger, best=best, random_name=random_name)
-            headers = {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Content-Disposition': 'attachment; filename=Shadowrocket.txt',
-                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
-                                         f"expire=253388144714"
-            }
+            file_data = generateShadowRocketSubFile(account,
+                                                    logger,
+                                                    best=best,
+                                                    random_name=random_name,
+                                                    ipv6=ipv6)
+            file_name = f'Shadowrocket-{fake.color_name()}.conf'
+
+        elif sub_type == 'sing-box':  # Sing Box
+            file_data = generateSingBoxSubFile(account,
+                                               logger,
+                                               best=best,
+                                               random_name=random_name,
+                                               ipv6=ipv6)
+            file_name = f'SingBox-{fake.color_name()}.json'
+
         # This might be deprecated in the future.
         elif sub_type == "only_proxies":  # Only proxies
-            fileData = generateClashSubFile(account, logger, best=best, proxy_format='with_groups',
-                                            random_name=random_name)
-            headers = {
-                'Content-Type': 'application/x-yaml; charset=utf-8',
-                'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
-                "Subscription-Userinfo": f"upload=0; download={account.usage}; total={account.quota}; "
-                                         f"expire=253388144714"
-            }
+            file_data = generateClashSubFile(account,
+                                             logger,
+                                             best=best,
+                                             proxy_format='with_groups',
+                                             random_name=random_name,
+                                             ipv6=ipv6)
+            file_name = f'Clash-{fake.color_name()}.yaml'
+
         else:
             return {
                 'code': 400,
                 'message': 'Unsupported sub type.'
             }, 400
 
-        response = make_response(fileData)
+        headers['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        response = make_response(file_data)
         response.headers = headers
 
         return response

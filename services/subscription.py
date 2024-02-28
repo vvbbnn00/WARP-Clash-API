@@ -40,18 +40,22 @@ SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
 
+SING_BOX = json.load(open("./config/sing-box.json", "r", encoding="utf8"))
+
 GEOIP = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
 
 
 def getRandomEntryPoints(best=False,
-                         logger=logging.getLogger(__name__)):
+                         logger=logging.getLogger(__name__),
+                         ipv6=False):
     """
     Get random entry points
     :param best: Whether to use the best entrypoints
     :param logger:
+    :param ipv6: Whether to use ipv6 entrypoints
     :return: list of entrypoints
     """
-    entrypoints = getEntrypoints()
+    entrypoints = getEntrypoints(ipv6=ipv6)
 
     # If there is no entrypoints, return a message
     if entrypoints is None or len(entrypoints) == 0:
@@ -62,7 +66,8 @@ def getRandomEntryPoints(best=False,
         logger.warning(f"Entrypoints is less than {RANDOM_COUNT}, only {len(entrypoints)} available.")
         random_points = entrypoints
     else:
-        random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT)
+        random_points = random.sample(entrypoints, RANDOM_COUNT) if not best else getBestEntrypoints(RANDOM_COUNT,
+                                                                                                     ipv6=ipv6)
 
     return random_points, ""
 
@@ -72,7 +77,8 @@ def generateClashSubFile(account: Account = None,
                          best=False,
                          proxy_format='full',
                          random_name=False,
-                         is_android=False):
+                         is_android=False,
+                         ipv6=False):
     """
     Generate Clash subscription file
     :param random_name: Whether to use random name
@@ -81,11 +87,12 @@ def generateClashSubFile(account: Account = None,
     :param logger:
     :param best: Whether to use the best entrypoints
     :param is_android: Whether the client is Android
+    :param ipv6: Whether to use ipv6 entrypoints
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
 
-    random_points, msg = getRandomEntryPoints(best, logger)
+    random_points, msg = getRandomEntryPoints(best, logger, ipv6=ipv6)
     if random_points is None:
         return msg
 
@@ -139,22 +146,28 @@ def generateClashSubFile(account: Account = None,
 
 def generateWireguardSubFile(account: Account = None,
                              logger=logging.getLogger(__name__),
-                             best=False):
+                             best=False,
+                             ipv6=False):
     """
     Generate Wireguard subscription file
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
+    :param ipv6: Whether to use ipv6 entrypoints
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
-    entrypoints = getEntrypoints()
+    entrypoints = getEntrypoints(ipv6=ipv6)
 
     # If there is no entrypoints, return a message
     if entrypoints is None or len(entrypoints) == 0:
         return "No entrypoints available. Please try again later."
 
-    random_point = random.choice(entrypoints) if not best else getBestEntrypoints(1)[0]
+    random_point = random.choice(entrypoints) if not best else getBestEntrypoints(1, ipv6=ipv6)[0]
+
+    ip = random_point.ip
+    if ipv6:
+        ip = f"[{ip}]"  # ipv6 address should be wrapped in square brackets
 
     # Generate user configuration file
     text = f"""[Interface]
@@ -166,7 +179,7 @@ MTU = 1280
 [Peer]
 PublicKey = {CF_CONFIG.get("publicKey")}
 AllowedIPs = 0.0.0.0/0, ::/0
-Endpoint = {random_point.ip}:{random_point.port}
+Endpoint = {ip}:{random_point.port}
 PersistentKeepalive = 25
 """
     return text
@@ -176,7 +189,8 @@ def generateSurgeSubFile(account: Account = None,
                          logger=logging.getLogger(__name__),
                          best=False,
                          proxy_format='full',
-                         random_name=False):
+                         random_name=False,
+                         ipv6=False):
     """
     Generate Surge subscription file
     :param random_name: Whether to use random name
@@ -184,11 +198,12 @@ def generateSurgeSubFile(account: Account = None,
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
+    :param ipv6: Whether to use ipv6 entrypoints
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
 
-    random_points, msg = getRandomEntryPoints(best, logger)
+    random_points, msg = getRandomEntryPoints(best, logger, ipv6)
     if random_points is None:
         return msg
 
@@ -198,14 +213,18 @@ def generateSurgeSubFile(account: Account = None,
     # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
     for i in range(len(random_points)):
         point = random_points[i]
+        ip = point.ip
+        if ipv6:
+            ip = f"[{ip}]"  # ipv6 address should be wrapped in square brackets
         user_config.append(
             {
-                "self-ip": point.ip,
+                "self-ip": "172.16.0.2",
                 "private-key": account.private_key,
                 "dns-server": "1.1.1.1",
                 "mtu": 1420,
                 "peer": f'(public-key = {CF_CONFIG.get("publicKey")}, allowed-ips = "0.0.0.0/0, ::/0", '
-                        f'endpoint = {point.ip}:{point.port})'
+                        f'endpoint = {ip}:{point.port})',
+                "endpoint": f"{ip}|{point.port}"
             })
 
     surge_config = copy.deepcopy(SURGE)
@@ -216,8 +235,12 @@ def generateSurgeSubFile(account: Account = None,
     for config in user_config:
         # random a name like 2FDEC93F, num and upper letter
         name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
-        country = GEOIP.lookup(config['self-ip'])
-        country_emoji = GEOIP.lookup_emoji(config['self-ip'])
+
+        ip, port = config['endpoint'].split("|")
+        country = GEOIP.lookup(ip)
+        country_emoji = GEOIP.lookup_emoji(ip)
+        del config['endpoint']
+
         proxy_name = node_name_generator.next(country_emoji, country)
 
         surge_config[f'WireGuard {name}'] = config
@@ -259,18 +282,20 @@ def generateSurgeSubFile(account: Account = None,
 def generateShadowRocketSubFile(account: Account = None,
                                 logger=logging.getLogger(__name__),
                                 best=False,
-                                random_name=False):
+                                random_name=False,
+                                ipv6=False):
     """
     Generate ShadowRocket subscription file
     :param account:
     :param logger:
     :param best: Whether to use the best entrypoints
     :param random_name: Whether to use random name
+    :param ipv6: Whether to use ipv6 entrypoints
     :return:
     """
     account = getCurrentAccount(logger) if account is None else account
 
-    random_points, msg = getRandomEntryPoints(best, logger)
+    random_points, msg = getRandomEntryPoints(best, logger, ipv6)
     if random_points is None:
         return msg
 
@@ -284,7 +309,10 @@ def generateShadowRocketSubFile(account: Account = None,
         country = GEOIP.lookup(point.ip)
         country_emoji = GEOIP.lookup_emoji(point.ip)
         name = node_name_generator.next(country_emoji, country)
-        url = f"wg://{point.ip}:{point.port}?publicKey={CF_CONFIG.get('publicKey')}&privateKey={account.private_key}" \
+        ip = point.ip
+        if ipv6:
+            ip = f"[{ip}]"  # ipv6 address should be wrapped in square brackets
+        url = f"wg://{ip}:{point.port}?publicKey={CF_CONFIG.get('publicKey')}&privateKey={account.private_key}" \
               f"&dns=1.1.1.1,1.0.0.1" \
               f"&ip=172.16.0.2&udp=1&flag={country}#{urllib.parse.quote(name)}"
         url_list.append(url)
@@ -293,3 +321,73 @@ def generateShadowRocketSubFile(account: Account = None,
     sub_data = base64.b64encode(sub_data.encode("utf-8")).decode("utf-8")
 
     return sub_data
+
+
+def generateSingBoxSubFile(account: Account = None,
+                           logger=logging.getLogger(__name__),
+                           random_name=False,
+                           best=False,
+                           ipv6=False):
+    """
+    Generate SingBox subscription file
+    :param account:
+    :param logger:
+    :param random_name: Whether to use random name
+    :param best: Whether to use the best entrypoints
+    :param ipv6: Whether to use ipv6 entrypoints
+    :return:
+    """
+    account = getCurrentAccount(logger) if account is None else account
+
+    random_points, msg = getRandomEntryPoints(best, logger, ipv6)
+    if random_points is None:
+        return msg
+
+    # Initialize NodeNameGenerator
+    node_name_generator = NodeNameGenerator(random_name)
+
+    sing_box_json = copy.deepcopy(SING_BOX)
+
+    # Generate outbounds
+    outbounds = []
+    name_list = []
+
+    # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
+    for i in range(len(random_points)):
+        point = random_points[i]
+        country = GEOIP.lookup(point.ip)
+        country_emoji = GEOIP.lookup_emoji(point.ip)
+        name = node_name_generator.next(country_emoji, country)
+
+        outbounds.append(
+            {
+                "server": point.ip,
+                "server_port": point.port,
+                "peers": [{
+                    "server": point.ip,
+                    "server_port": point.port,
+                    "public_key": CF_CONFIG.get("publicKey"),
+                    "pre_shared_key": "",
+                    "allowed_ips": ['0.0.0.0/0', '::/0']
+                }],
+                "tag": name,
+                "type": "wireguard",
+                "local_address": ["172.16.0.2/32"],
+                "private_key": account.private_key,
+                "peer_public_key": CF_CONFIG.get("publicKey"),
+                "system_interface": False,
+                "mtu": 1280
+            }
+        )
+
+        name_list.append(name)
+
+    sing_box_json["outbounds"].extend(outbounds)
+
+    # Section Select
+    sing_box_json["outbounds"][0]["outbounds"].extend(name_list)
+
+    # Section UrlTest
+    sing_box_json["outbounds"][1]["outbounds"].extend(name_list)
+
+    return json.dumps(sing_box_json, ensure_ascii=False)
