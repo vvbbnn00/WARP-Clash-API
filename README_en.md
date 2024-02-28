@@ -101,7 +101,24 @@ Here are the available environment variables:
 | SECRET_KEY             | `None`                            | Used to protect the subscription link. If not configured, no `SECRET_KEY` input is required to get the link.                                                                                                                                                                                                               |
 | SHARE_SUBSCRIPTION     | `False`                           | If you want to share subscriptions with the community but doesn't want your account information to be publicly accessible or modified, you can set this to `True`. In this case, accessing the subscription link does not require entering the `SECRET_KEY`, but for other operations, the `SECRET_KEY` is still required. |
 
+### 📝 Configuration Example
+
+If you set `SECRET_KEY` to `123456` and plan to share the subscription with the community, your `.env.local` file should
+look like this:
+
+```
+SECRET_KEY=123456
+SHARE_SUBSCRIPTION=True
+```
+
 ## 🧰 Advanced Operations
+
+**Please note that if you set `SECRET_KEY`, you need to add the `secret_key` parameter at the end of the URL**, for
+example:
+
+```
+http://your_IP:21001/some/api/actions?secret_key=your_secret_key
+```
 
 ### Resetting the `PublicKey` and `PrivateKey` of an Account
 
