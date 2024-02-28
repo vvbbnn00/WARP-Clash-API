@@ -12,8 +12,8 @@ archAffix() {
 }
 
 endpointyx() {
-    # 判断 wget 是否存在
-    if ! command -v wget >/dev/null; then
+    # 判断 warp 文件是否存在，不存在则下载
+    if ! [ -f warp ]; then
       # 下载优选工具软件，感谢某匿名网友的分享的优选工具
       wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-"$(archAffix)" -O warp || { echo "下载优选工具失败"; exit 1; }
     fi
