@@ -11,7 +11,7 @@ assignees: vvbbnn00
 
 **📜 Checklist**
 - [ ] I understand that the current issue mainly handles `bugs` and accepts `feature requests`. Other types of issues (such as operational, configuration issues, client issues, etc.) should be posted in [discussions](https://github.com/vvbbnn00/WARP-Clash-API/discussions), otherwise, the issue may be closed.
-- [ ] I have verified that this bug has not been mentioned in other issues.
+- [ ] I have verified that this `feature request` has not been mentioned in other issues.
 - [ ] (Optional) For this `Feature Request`, I have already implemented a solution and opened a related `Pull Request` (thank you for your contribution!)
 
 
