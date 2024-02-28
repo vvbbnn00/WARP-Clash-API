@@ -1,8 +1,7 @@
 #!/bin/bash
 # This script is modified from https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/get_entrypoints.sh
 
-
-archAffix(){
+archAffix() {
     case "$(uname -m)" in
         i386 | i686 ) echo '386' ;;
         x86_64 | amd64 ) echo 'amd64' ;;
@@ -12,9 +11,12 @@ archAffix(){
     esac
 }
 
-endpointyx(){
-    # 下载优选工具软件，感谢某匿名网友的分享的优选工具
-    wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-"$(archAffix)" -O warp
+endpointyx() {
+    # 判断 wget 是否存在
+    if ! command -v wget >/dev/null; then
+      # 下载优选工具软件，感谢某匿名网友的分享的优选工具
+      wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-"$(archAffix)" -O warp || { echo "下载优选工具失败"; exit 1; }
+    fi
 
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
     ulimit -n 102400
@@ -24,9 +26,9 @@ endpointyx(){
 
     # 读取 WARP Endpoint IP 优选工具生成的 Endpoint IP 段列表
     process_result_csv() {
-        awk -F, '$3!="timeout ms" {print}' | 
-        sort -t, -nk2 -nk3 | 
-        uniq | 
+        awk -F, '$3!="timeout ms" {print}' |
+        sort -t, -nk2 -nk3 |
+        uniq |
         head -11
     }
 
@@ -35,117 +37,82 @@ endpointyx(){
 
     # 将优选结果移动到指定目录
     if [ -n "$RUN_IN_DOCKER" ]; then
-      mv -f result.csv /app/config/result.csv
+      mv -f result.csv "/app/config/result${suffix}.csv"
     else
-      mv -f result.csv ./config/result.csv
+      mv -f result.csv "./config/result${suffix}.csv"
     fi
 
-    # 删除 WARP Endpoint IP 优选工具及其附属文件
-    rm -f warp ip.txt
+    # 删除附属文件
+    rm -f ip.txt
 }
 
-endpoint4(){
-    # 生成优选 WARP IPv4 Endpoint IP 段列表
-    n=0
-    iplist=100
-    while true; do
-        temp[$n]=$(echo 162.159.192.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 162.159.193.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 162.159.195.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 162.159.204.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 188.114.96.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 188.114.97.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 188.114.98.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-        temp[$n]=$(echo 188.114.99.$(($RANDOM % 256)))
-        n=$(($n + 1))
-        if [ $n -ge $iplist ]; then
-            break
-        fi
-    done
-    while true; do
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 162.159.192.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 162.159.193.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 162.159.195.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 162.159.204.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 188.114.96.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 188.114.97.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 188.114.98.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
-        if [ "$(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l)" -ge $iplist ]; then
-            break
-        else
-            temp[$n]=$(echo 188.114.99.$(($RANDOM % 256)))
-            n=$(($n + 1))
-        fi
+generate_random_ips() {
+    local iplist=100
+    local count=0
+    local ip_base=("162.159.192." "162.159.193." "162.159.195." "162.159.204." "188.114.96." "188.114.97." "188.114.98." "188.114.99.")
+
+    while [ $count -lt $iplist ]; do
+        for base in "${ip_base[@]}"; do
+            temp[$count]="${base}$(($RANDOM % 256))"
+            ((count++))
+            [ $count -ge $iplist ] && break
+        done
     done
 
-    # 将生成的 IP 段列表放到 ip.txt 里，待程序优选
-    echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u > ip.txt
+    # 确保列表中的 IP 地址是唯一的
+    printf '%s\n' "${temp[@]}" | sort -u > ip.txt
+}
 
-    # 启动优选程序
+endpoint4() {
+    generate_random_ips
     endpointyx
 }
 
-endpoint4
+generate_random_ipv6s() {
+    local iplist=100
+    local n=0
+    local temp
+
+    while [ $n -lt $iplist ]; do
+        local hex1 hex2 hex3 hex4
+        hex1=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
+        hex2=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
+        hex3=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
+        hex4=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
+        temp[$n]="[2606:4700:d0::$hex1:$hex2:$hex3:$hex4]"
+        ((n++))
+        [ $n -ge $iplist ] && break
+
+        temp[$n]="[2606:4700:d1::$hex1:$hex2:$hex3:$hex4]"
+        ((n++))
+    done
+
+    # 确保列表中的 IP 地址是唯一的
+    printf '%s\n' "${temp[@]}" | sort -u > ip.txt
+}
+
+endpoint6() {
+    generate_random_ipv6s
+    endpointyx
+}
+
+suffix=
+
+# 检查传入参数，若含有-4或-6则优选对应的IP段
+while getopts "46" OPT; do
+    case $OPT in
+        6)
+          suffix=_v6
+          endpoint6
+          ;;
+        4)
+          endpoint4
+          ;; # 默认优选 IPv4
+        *)
+          echo "Usage: $0 [-4|-6]" && exit 1
+          ;;
+    esac
+done
+
+# 若未传入参数则优选 IPv4
+[ -z "$1" ] && endpoint4

@@ -183,6 +183,7 @@ def attachEndpoints(app: Flask):
         best = request.args.get('best', 'false').lower() == "true" or False
         random_name = request.args.get('randomName', 'false').lower() == "true" or False
         proxy_format = request.args.get('proxyFormat', 'full').lower()
+        ipv6 = request.args.get('ipv6', 'false').lower() == "true" or False
 
         if sub_type == "clash":  # Clash
 
@@ -196,7 +197,8 @@ def attachEndpoints(app: Flask):
                                             best=best,
                                             proxy_format=proxy_format,
                                             random_name=random_name,
-                                            is_android=is_android)
+                                            is_android=is_android,
+                                            ipv6=ipv6)
             headers = {
                 'Content-Type': 'application/x-yaml; charset=utf-8',
                 'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
@@ -204,7 +206,10 @@ def attachEndpoints(app: Flask):
                                          f"expire=253388144714"
             }
         elif sub_type == "wireguard":  # Wireguard
-            fileData = generateWireguardSubFile(account, logger, best=best)
+            fileData = generateWireguardSubFile(account,
+                                                logger,
+                                                best=best,
+                                                ipv6=ipv6)
             headers = {
                 'Content-Type': 'application/x-conf; charset=utf-8',
                 'Content-Disposition': f'attachment; filename={fake.lexify("????????????").lower()}.conf'
@@ -214,7 +219,8 @@ def attachEndpoints(app: Flask):
                                             logger,
                                             best=best,
                                             random_name=random_name,
-                                            proxy_format=proxy_format)
+                                            proxy_format=proxy_format,
+                                            ipv6=ipv6)
             headers = {
                 'Content-Type': 'text/plain; charset=utf-8',
                 'Content-Disposition': 'attachment; filename=surge.conf',
@@ -222,7 +228,11 @@ def attachEndpoints(app: Flask):
                                          f"expire=253388144714"
             }
         elif sub_type == 'shadowrocket':  # Shadowrocket
-            fileData = generateShadowRocketSubFile(account, logger, best=best, random_name=random_name)
+            fileData = generateShadowRocketSubFile(account,
+                                                   logger,
+                                                   best=best,
+                                                   random_name=random_name,
+                                                   ipv6=ipv6)
             headers = {
                 'Content-Type': 'text/plain; charset=utf-8',
                 'Content-Disposition': 'attachment; filename=Shadowrocket.txt',
@@ -231,8 +241,12 @@ def attachEndpoints(app: Flask):
             }
         # This might be deprecated in the future.
         elif sub_type == "only_proxies":  # Only proxies
-            fileData = generateClashSubFile(account, logger, best=best, proxy_format='with_groups',
-                                            random_name=random_name)
+            fileData = generateClashSubFile(account,
+                                            logger,
+                                            best=best,
+                                            proxy_format='with_groups',
+                                            random_name=random_name,
+                                            ipv6=ipv6)
             headers = {
                 'Content-Type': 'application/x-yaml; charset=utf-8',
                 'Content-Disposition': f'attachment; filename=Clash-{fake.color_name()}.yaml',
