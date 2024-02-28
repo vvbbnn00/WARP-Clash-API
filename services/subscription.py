@@ -40,6 +40,8 @@ SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
 
+SING_BOX = json.load(open("./config/sing-box.json", "r", encoding="utf8"))
+
 GEOIP = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
 
 
@@ -319,3 +321,73 @@ def generateShadowRocketSubFile(account: Account = None,
     sub_data = base64.b64encode(sub_data.encode("utf-8")).decode("utf-8")
 
     return sub_data
+
+
+def generateSingBoxSubFile(account: Account = None,
+                           logger=logging.getLogger(__name__),
+                           random_name=False,
+                           best=False,
+                           ipv6=False):
+    """
+    Generate SingBox subscription file
+    :param account:
+    :param logger:
+    :param random_name: Whether to use random name
+    :param best: Whether to use the best entrypoints
+    :param ipv6: Whether to use ipv6 entrypoints
+    :return:
+    """
+    account = getCurrentAccount(logger) if account is None else account
+
+    random_points, msg = getRandomEntryPoints(best, logger, ipv6)
+    if random_points is None:
+        return msg
+
+    # Initialize NodeNameGenerator
+    node_name_generator = NodeNameGenerator(random_name)
+
+    sing_box_json = copy.deepcopy(SING_BOX)
+
+    # Generate outbounds
+    outbounds = []
+    name_list = []
+
+    # Use len() instead of RANDOM_COUNT because the entrypoints may be less than RANDOM_COUNT
+    for i in range(len(random_points)):
+        point = random_points[i]
+        country = GEOIP.lookup(point.ip)
+        country_emoji = GEOIP.lookup_emoji(point.ip)
+        name = node_name_generator.next(country_emoji, country)
+
+        outbounds.append(
+            {
+                "server": point.ip,
+                "server_port": point.port,
+                "peers": [{
+                    "server": point.ip,
+                    "server_port": point.port,
+                    "public_key": CF_CONFIG.get("publicKey"),
+                    "pre_shared_key": "",
+                    "allowed_ips": ['0.0.0.0/0', '::/0']
+                }],
+                "tag": name,
+                "type": "wireguard",
+                "local_address": ["172.16.0.2/32"],
+                "private_key": account.private_key,
+                "peer_public_key": CF_CONFIG.get("publicKey"),
+                "system_interface": False,
+                "mtu": 1280
+            }
+        )
+
+        name_list.append(name)
+
+    sing_box_json["outbounds"].extend(outbounds)
+
+    # Section Select
+    sing_box_json["outbounds"][0]["outbounds"].extend(name_list)
+
+    # Section UrlTest
+    sing_box_json["outbounds"][1]["outbounds"].extend(name_list)
+
+    return json.dumps(sing_box_json, ensure_ascii=False)

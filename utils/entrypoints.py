@@ -81,7 +81,7 @@ def reloadEntrypoints(ipv6=False):
 
             entrypoint = Entrypoint()
             entrypoint.ip = ip
-            entrypoint.port = port
+            entrypoint.port = int(port)
             entrypoint.loss = loss
             entrypoint.delay = delay
 
