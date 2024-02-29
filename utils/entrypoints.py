@@ -16,6 +16,7 @@ along with this program; if not, see <https://www.gnu.org/licenses>.
 """
 import copy
 import csv
+import logging
 
 from flask import current_app
 
@@ -32,6 +33,20 @@ RESULT_LAST_MODIFIED_V6 = 0
 
 ENTRYPOINTS = []
 ENTRYPOINTS_V6 = []
+
+
+def _getLogger():
+    """
+    Get logger
+    :return: logger
+    """
+    try:
+        if hasattr(current_app, 'logger'):
+            return current_app.logger
+        else:
+            return logging.getLogger(__name__)
+    except RuntimeError:
+        return logging.getLogger(__name__)
 
 
 def readCsv(file_path):
@@ -55,8 +70,11 @@ def reloadEntrypoints(ipv6=False):
     """
     global ENTRYPOINTS, ENTRYPOINTS_V6, RESULT_LAST_MODIFIED, RESULT_LAST_MODIFIED_V6
 
+    # Get logger
+    logger = _getLogger()
+
     result_file = RESULT_PATH_V6 if ipv6 else RESULT_PATH
-    current_app.logger.info(f"Reload entrypoints from {result_file}")
+    logger.info(f"Reload entrypoints from {result_file}")
 
     if ipv6:
         RESULT_LAST_MODIFIED_V6 = os.path.getmtime(result_file)
@@ -87,7 +105,7 @@ def reloadEntrypoints(ipv6=False):
 
             entrypoints.append(entrypoint)
         except Exception as e:
-            current_app.logger.error(f"Error when reading row: {row}, error: {e}")
+            logger.error(f"Error when reading row: {row}, error: {e}")
 
     return entrypoints
 
@@ -101,6 +119,9 @@ def getEntrypoints(ipv6=False):
     """
     entrypoints = copy.copy(ENTRYPOINTS_V6 if ipv6 else ENTRYPOINTS)
 
+    # Get logger
+    logger = _getLogger()
+
     if not entrypoints or len(entrypoints) == 0:
         return reloadEntrypoints(ipv6)
 
@@ -109,7 +130,7 @@ def getEntrypoints(ipv6=False):
 
     # Check if file has been modified
     if last_modified != os.path.getmtime(result_file):
-        current_app.logger.info(f"File {last_modified} has been modified, will reload entrypoints.")
+        logger.info(f"File {last_modified} has been modified, will reload entrypoints.")
         return reloadEntrypoints(ipv6)
 
     return entrypoints
@@ -132,9 +153,12 @@ def optimizeEntrypoints():
     Optimize entrypoints
     :return:
     """
+    # Get logger
+    logger = _getLogger()
+
     # Check current path
     if not os.path.exists(ENTRYPOINT_SCRIPT_PATH):
-        current_app.logger.error(f"File {ENTRYPOINT_SCRIPT_PATH} does not exist.")
+        logger.error(f"File {ENTRYPOINT_SCRIPT_PATH} does not exist.")
         return
 
     # Fix ./scripts/get_entrypoint.sh if it has CRLF
