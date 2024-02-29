@@ -16,10 +16,13 @@ along with this program; if not, see <https://www.gnu.org/licenses>.
 """
 import unittest
 
+from utils.entrypoints import *
 from utils.geoip import GeoIP, countryCodeToEmoji
 from utils.proxy import getProxy
 from utils.wireguard import generateWireguardKeys
-from utils.entrypoints import *
+
+# Change working directory to the root directory
+os.chdir(os.path.join(os.path.dirname(__file__), ".."))
 
 
 class TestUtils(unittest.TestCase):
@@ -41,7 +44,7 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(len(entrypoints) > 0)
 
     def test_GeoIP(self):
-        geoip = GeoIP('../config/geolite/GeoLite2-Country.mmdb')
+        geoip = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
         country = geoip.lookup('8.8.8.8')
         self.assertTrue(country)
         self.assertEqual(country, "US")

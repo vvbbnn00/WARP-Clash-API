@@ -31,15 +31,20 @@ def countryCodeToEmoji(country_code):
 
 
 class GeoIP:
-    def __init__(self, db_path):
+    def __init__(self, db_path: str) -> None:
         self.db = maxminddb.open_database(db_path)
 
-    def lookup(self, ip):
+    def lookup(self, ip: str) -> str or None:
         """
         Lookup ip to get country code
         :param ip:
         :return:
         """
+
+        # Remove brackets from IPv6 addresses
+        if ip.startswith('['):
+            ip = ip.replace('[', '').replace(']', '')
+
         result = self.db.get(ip)
         try:
             if result:
@@ -53,7 +58,7 @@ class GeoIP:
         except Exception as e:
             return None
 
-    def lookup_emoji(self, ip):
+    def lookup_emoji(self, ip: str) -> str or None:
         """
         Lookup ip to get country emoji
         :param ip:
@@ -62,7 +67,7 @@ class GeoIP:
         result = self.lookup(ip)
         return countryCodeToEmoji(result)
 
-    def close(self):
+    def close(self) -> None:
         """
         Close database
         :return:
