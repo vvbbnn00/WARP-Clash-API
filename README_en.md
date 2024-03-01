@@ -113,11 +113,11 @@ SHARE_SUBSCRIPTION=True
 
 ## 🧰 Advanced Operations
 
-**Please note that if you set `SECRET_KEY`, you need to add the `secret_key` parameter at the end of the URL**, for
+**Please note that if you set `SECRET_KEY`, you need to add the `key` parameter at the end of the URL**, for
 example:
 
 ```
-http://your_IP:21001/some/api/actions?secret_key=your_secret_key
+http://your_IP:21001/some/api/actions?key=your_secret_key
 ```
 
 ### Resetting the `PublicKey` and `PrivateKey` of an Account
