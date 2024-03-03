@@ -42,7 +42,7 @@ def resetAccountKey(logger=logging.Logger(__name__)):
     # Save account to file
     account.save()
 
-    logger.info(f"Account key reset done")
+    logger.info("Account key reset done")
 
 
 def doUpdateLicenseKey(license_key: str, logger=logging.Logger(__name__)):
@@ -58,7 +58,7 @@ def doUpdateLicenseKey(license_key: str, logger=logging.Logger(__name__)):
     account = getCurrentAccount(logger)
 
     if account.license_key == license_key:
-        logger.warning(f"License key is the same, no need to update")
+        logger.warning("License key is the same, no need to update")
         return
 
     # Update license key
@@ -71,4 +71,4 @@ def doUpdateLicenseKey(license_key: str, logger=logging.Logger(__name__)):
     # Account needs to be reset after license key update
     resetAccountKey(logger)
 
-    logger.info(f"License key updated")
+    logger.info("License key updated")

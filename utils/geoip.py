@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, see <https://www.gnu.org/licenses>.
 
 """
+import logging
 import maxminddb
 
 
@@ -56,6 +57,7 @@ class GeoIP:
             else:
                 return None
         except Exception as e:
+            logging.error(f"Failed to lookup ip: {ip}, error: {e}")
             return None
 
     def lookup_emoji(self, ip: str) -> str or None:

@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, see <https://www.gnu.org/licenses>.
 
 """
+import logging
 import time
 from functools import wraps
 
@@ -22,7 +23,7 @@ from flask import Flask, request, make_response, current_app, render_template
 
 from config import SECRET_KEY, REQUEST_RATE_LIMIT, SHARE_SUBSCRIPTION
 from services.account import resetAccountKey, doUpdateLicenseKey
-from services.common import *
+from services.common import getCurrentAccount
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
     generateShadowRocketSubFile, generateSingBoxSubFile
 
@@ -287,5 +288,5 @@ def createApp(app_name: str = "web", logger: logging.Logger = None) -> Flask:
 
 
 if __name__ == '__main__':
-    runApp = createApp()
-    runApp.run(host='0.0.0.0', port=5000, debug=True)
+    run_app = createApp()
+    run_app.run(host='0.0.0.0', port=5000, debug=True)

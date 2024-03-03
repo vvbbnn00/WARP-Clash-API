@@ -27,13 +27,13 @@ def getCurrentAccount(logger=logging.Logger(__name__)):
     :param logger: 
     :return:
     """
-    logger.info(f"Get current account")
+    logger.info("Get current account")
     try:
         account = Account.load()
     except FileNotFoundError:
         account = None
     if account is None:
-        logger.info(f"No account found, register a new one")
+        logger.info("No account found, register a new one")
         privkey, pubkey = generateWireguardKeys()
         account = register(pubkey, privkey)
         account.save()
