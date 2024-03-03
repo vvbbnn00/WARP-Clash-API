@@ -1,5 +1,9 @@
 # WARP Clash API
 
+![GitHub License](https://img.shields.io/github/license/vvbbnn00/WARP-Clash-API)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/67ca8d105fb947eca6204230ba3ac09b)](https://app.codacy.com/gh/vvbbnn00/WARP-Clash-API/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+![GitHub Repo stars](https://img.shields.io/github/stars/vvbbnn00/WARP-Clash-API?style=flat)
+
 [中文](README.md) | English
 
 > **Warning**
