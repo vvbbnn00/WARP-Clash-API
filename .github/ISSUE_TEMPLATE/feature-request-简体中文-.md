@@ -10,7 +10,10 @@ assignees: vvbbnn00
 **为了更快地定位问题并减少不必要的麻烦，请在发起issue前检查是否已有相关issue存在，谢谢！**
 
 **📜 检查表**
-- [ ] 我已了解目前issue主要处理`bug`和接收`feature request`，其他类型的问题（如操作、配置问题，客户端问题等）应发布在[discussions](https://github.com/vvbbnn00/WARP-Clash-API/discussions)中，否则该issue可能被关闭。
+
+- [ ] 我已了解目前issue主要处理`bug`和接收`feature request`
+  ，其他类型的问题（如操作、配置问题，客户端问题等）应发布在[discussions](https://github.com/vvbbnn00/WARP-Clash-API/discussions)
+  中，否则该issue可能被关闭。
 - [ ] 我已核实该`feature request`尚未在其他issue中被提及。
 - [ ] 【可选】针对该`Feature Request`，我已经进行了实现，并开启了关联的`Pull Request`（感谢您的贡献！）
 

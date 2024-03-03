@@ -106,7 +106,7 @@ Here are the available environment variables:
 If you set `SECRET_KEY` to `123456` and plan to share the subscription with the community, your `.env.local` file should
 look like this:
 
-```
+```env
 SECRET_KEY=123456
 SHARE_SUBSCRIPTION=True
 ```
@@ -116,7 +116,7 @@ SHARE_SUBSCRIPTION=True
 **Please note that if you set `SECRET_KEY`, you need to add the `secret_key` parameter at the end of the URL**, for
 example:
 
-```
+```text
 http://your_IP:21001/some/api/actions?secret_key=your_secret_key
 ```
 
@@ -149,4 +149,5 @@ projects:
 - [warp-script](https://gitlab.com/Misaka-blog/warp-script)
 - [warp](https://replit.com/@aliilapro/warp)
 - [wgcf](https://github.com/ViRb3/wgcf)
-
+- [proxy_pool](https://github.com/jhao104/proxy_pool)
+- [geolite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data)

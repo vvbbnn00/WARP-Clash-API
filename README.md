@@ -105,7 +105,7 @@ SHARE_SUBSCRIPTION=True
 
 **请注意，如果您设置了`SECRET_KEY`，需要在URL的末尾添加`secret_key`参数**，例如：
 
-```
+```text
 http://your_IP:21001/some/api/actions?secret_key=your_secret_key
 ```
 
@@ -138,4 +138,3 @@ curl -X POST http://host:port/api/account/update_license -H "Content-Type: appli
 - [wgcf](https://github.com/ViRb3/wgcf)
 - [proxy_pool](https://github.com/jhao104/proxy_pool)
 - [geolite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data)
-
