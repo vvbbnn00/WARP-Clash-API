@@ -16,6 +16,7 @@ along with this program; if not, see <https://www.gnu.org/licenses>.
 """
 import datetime
 import json
+import logging
 
 ACCOUNT_PATH = "account/account.json"
 
@@ -61,4 +62,5 @@ class Account:
                 account.__dict__ = data
                 return account
         except Exception as e:
+            logging.error(f"Failed to load account from file: {e}")
             return None

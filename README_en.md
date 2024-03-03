@@ -4,25 +4,31 @@
 
 > **Warning**
 >
-> This project is entirely non-commercial and is intended solely for educational and communicative purposes. Please do
-> not use it for illegal activities, as the consequences will be borne by the user.
+> This project is entirely non-commercial and is intended solely for educational
+> and communicative purposes. Please do not use it for illegal activities, as
+> the consequences will be borne by the user.
 
 ## 🤔 What is This?
 
-This project allows you to use `WARP+` through a subscription, supporting clients
-like `Clash`, `Shadowrocket`, etc. The project includes a feature to replenish `WARP+` traffic,
-enabling your `WARP+` traffic to be unrestricted (1GB of traffic every 18 seconds). Additionally, it comes with IP
-optimization. It supports one-click deployment through `Docker compose`, so you can enjoy your private
-high-speed `WARP+` node without extra hassle!
+This project allows you to use `WARP+` through a subscription, supporting
+clients like `Clash`, `Shadowrocket`, etc. The project includes a feature to
+replenish `WARP+` traffic, enabling your `WARP+` traffic to be unrestricted
+(1GB of traffic every 18 seconds). Additionally, it comes with IP optimization.
+
+It supports one-click deployment through `Docker compose`, so you can enjoy
+your private high-speed `WARP+` node without extra hassle!
 
 ## 💡 Key Features
 
 - 💻 Supports clients such as `Clash`, `Surge`, `Shadowrocket`, etc.
+- 
 - 🔑 Supports setting your own `LicenseKey`.
 - 🌏 Supports IP optimization.
 - 🐋 Supports one-click deployment using `Docker compose`.
-- 📕 Automatically replenishes `WARP+` traffic, requests are proxied, preserving your IP from getting blocked.
-- ❓ Randomly selects nodes each subscription update, adding a sense of randomness to your experience.
+- 📕 Automatically replenishes `WARP+` traffic, requests are proxied, 
+preserving your IP from getting blocked.
+- ❓ Randomly selects nodes each subscription update, adding a sense of
+randomness to your experience.
 
 ## 🚀 Quick Start
 
@@ -40,14 +46,16 @@ git clone https://github.com/vvbbnn00/WARP-Clash-API.git
 
 ### 3. [Optional] Configure `SECRET_KEY`
 
-If you plan to deploy this project on the public internet, it's recommended to set up the `SECRET_KEY`. Create
-a `.env.local` file in the project directory and add the following:
+If you plan to deploy this project on the public internet, it's recommended to
+set up the `SECRET_KEY`. Create a `.env.local` file in the project directory
+and add the following:
 
 ```bash
 SECRET_KEY=your_secret_key
 ```
 
-For more information on environment variables, refer to [Environment Variables](#-environment-variables).
+For more information on environment variables, refer to
+[Environment Variables](#-environment-variables).
 
 ### 4. Build and Run
 
@@ -57,18 +65,19 @@ docker-compose up -d
 
 ### 5. Obtain Subscription Link
 
-Visit `http://your_IP:21001`, enter the `SECRET_KEY` and `PUBLIC_URL` (if configured), and you can get the subscription
-link.
+Visit `http://your_IP:21001`, enter the `SECRET_KEY` and `PUBLIC_URL` (if
+configured), and you can get the subscription link.
 
 **🎉 Congratulations, you're all set!**
 
 ## 🌏 Manual IP Optimization
 
-The project includes a pre-optimized list of IPs, but due to the dynamic nature of `WARP` IPs, there might be cases
-where IPs become unusable. If you wish to optimize manually, follow these steps:
+The project includes a pre-optimized list of IPs, but due to the dynamic
+nature of `WARP` IPs, there might be cases where IPs become unusable. If you
+wish to optimize manually, follow these steps:
 
-If you deployed via `docker-compose`, you can manually execute IP optimization with the following command in the project
-directory:
+If you deployed via `docker-compose`, you can manually execute IP optimization
+with the following command in the project directory:
 
 ```bash
 docker-compose exec warp-clash python3 app.py optimize
@@ -82,8 +91,8 @@ python3 app.py optimize
 
 ## 🔧 Environment Variables
 
-Yes, you can configure this project using environment variables. Simply create a `.env.local` file and add the required
-environment variables.
+Yes, you can configure this project using environment variables. Simply create
+a `.env.local` file and add the required environment variables.
 
 Here are the available environment variables:
 
@@ -103,50 +112,55 @@ Here are the available environment variables:
 
 ### 📝 Configuration Example
 
-If you set `SECRET_KEY` to `123456` and plan to share the subscription with the community, your `.env.local` file should
-look like this:
+If you set `SECRET_KEY` to `123456` and plan to share the subscription with
+the community, your `.env.local` file should look like this:
 
-```
+```env
 SECRET_KEY=123456
 SHARE_SUBSCRIPTION=True
 ```
 
 ## 🧰 Advanced Operations
 
-**Please note that if you set `SECRET_KEY`, you need to add the `key` parameter at the end of the URL**, for
-example:
+**Please note that if you set `SECRET_KEY`, you need to add the `key`
+parameter at the end of the URL**, for example:
 
-```
+```text
 http://your_IP:21001/some/api/actions?key=your_secret_key
 ```
 
 ### Resetting the `PublicKey` and `PrivateKey` of an Account
 
-The project supports resetting the `PublicKey` and `PrivateKey` by requesting the following interface:
+The project supports resetting the `PublicKey` and `PrivateKey` by requesting
+the following interface:
 
 ```bash
 curl -X POST http://host:port/api/account/reset_key
 ```
 
-After resetting, it is necessary to re-acquire the subscription content; otherwise, it may not be usable.
+After resetting, it is necessary to re-acquire the subscription content;
+otherwise, it may not be usable.
 
 ### Setting Your Own `LicenseKey`
 
-If you already have a `WARP+` `LicenseKey`, you can set it through the following interface:
+If you already have a `WARP+` `LicenseKey`, you can set it through the
+following interface:
 
 ```bash
 curl -X POST http://host:port/api/account/update_license -H "Content-Type: application/json" -d "{\"license_key\": \"your_license_key\"}"
 ```
 
-Please note that when you set the `LicenseKey`, your `PublicKey` and `PrivateKey` will be reset, and you will need to
-re-acquire the subscription content.
+Please note that when you set the `LicenseKey`, your `PublicKey` and
+`PrivateKey` will be reset, and you will need to re-acquire the subscription
+content.
 
 ## 🗂️ Attribution
 
-This project's development was influenced by the following projects. Thanks to the authors of these open-source
-projects:
+This project's development was influenced by the following projects.
+Thanks to the authors of these open-source projects:
 
 - [warp-script](https://gitlab.com/Misaka-blog/warp-script)
 - [warp](https://replit.com/@aliilapro/warp)
 - [wgcf](https://github.com/ViRb3/wgcf)
-
+- [proxy_pool](https://github.com/jhao104/proxy_pool)
+- [geolite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data)

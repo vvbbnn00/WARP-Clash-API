@@ -17,10 +17,11 @@ along with this program; if not, see <https://www.gnu.org/licenses>.
 import copy
 import csv
 import logging
+import os
 
 from flask import current_app
 
-from config import *
+from config import DELAY_THRESHOLD, LOSS_THRESHOLD
 from models import Entrypoint
 
 ENTRYPOINT_SCRIPT_PATH = './scripts/get_entrypoints.sh'

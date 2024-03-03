@@ -33,7 +33,7 @@ def main(logger=None):
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger()
     scheduler = BackgroundScheduler()
-    logger.info(f"Start scheduler.")
+    logger.info("Start scheduler.")
 
     if DO_GET_WARP_DATA and GET_WARP_DATA_INTERVAL > 0:
         logger.info(f"DO_GET_WARP_DATA is True, will fetch WARP data per {GET_WARP_DATA_INTERVAL} seconds.")
@@ -54,7 +54,7 @@ def main(logger=None):
                         f"{REOPTIMIZE_INTERVAL} seconds.")
             scheduler.add_job(reoptimizeEntryPoints, 'interval', seconds=REOPTIMIZE_INTERVAL, args=[logger])
 
-    logger.info(f"Start save account job, will update account info per 120 seconds.")
+    logger.info("Start save account job, will update account info per 120 seconds.")
     scheduler.add_job(saveAccount, 'interval', seconds=120, args=[None, logger])
     scheduler.start()
 

@@ -18,6 +18,7 @@ import base64
 import configparser
 import copy
 import json
+import logging
 import random
 import string
 import tempfile
@@ -26,8 +27,9 @@ import urllib.parse
 import yaml
 from flask import request
 
-from config import *
-from services.common import *
+from config import PUBLIC_URL, RANDOM_COUNT, SECRET_KEY, SHARE_SUBSCRIPTION
+from models import Account
+from services.common import getCurrentAccount
 from utils.entrypoints import getEntrypoints, getBestEntrypoints
 from utils.geoip import GeoIP
 from utils.node_name import NodeNameGenerator
@@ -236,7 +238,7 @@ def generateSurgeSubFile(account: Account = None,
         # random a name like 2FDEC93F, num and upper letter
         name = ''.join(random.sample(string.ascii_uppercase + string.digits, 8))
 
-        ip, port = config['endpoint'].split("|")
+        ip = config['endpoint'].split("|")[0]
         country = GEOIP.lookup(ip)
         country_emoji = GEOIP.lookup_emoji(ip)
         del config['endpoint']
