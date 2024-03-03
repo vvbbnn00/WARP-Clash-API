@@ -8,9 +8,10 @@
 
 ## 🤔 这是什么？
 
-该项目可以让你通过订阅的方式使用`WARP+`，支持`Clash`、`Shadowrocket`等客户端。项目内置了刷取`WARP+`
-流量的功能，可以让你的`WARP+`流量不再受限制（每`18`秒可获得`1GB`流量），同时，配备了`IP`选优功能。支持`Docker compose`
-一键部署，无需额外操作，即可享受你自己的`WARP+`私有高速节点！
+该项目可以让你通过订阅的方式使用`WARP+`，支持`Clash`、`Shadowrocket`等客户端。项目内置了
+刷取`WARP+`流量的功能，可以让你的`WARP+`流量不再受限制（每`18`秒可获得`1GB`流量），同时，
+配备了`IP`选优功能。支持`Docker compose`一键部署，无需额外操作，即可享受你自己的`WARP+`私
+有高速节点！
 
 ## 💡 特色功能
 
@@ -36,7 +37,8 @@ git clone https://github.com/vvbbnn00/WARP-Clash-API.git
 
 ### 3. [可选] 配置`SECRET_KEY`
 
-若您需要在公网上部署该项目，建议您配置`SECRET_KEY`与`PUBLIC_URL`。在项目目录下创建`.env.local`文件，写入如下内容：
+若您需要在公网上部署该项目，建议您配置`SECRET_KEY`与`PUBLIC_URL`。在项目目录下创建
+`.env.local`文件，写入如下内容：
 
 ```bash
 SECRET_KEY=your_secret_key
@@ -58,7 +60,8 @@ docker-compose up -d
 
 ## 🌏 手动IP选优
 
-项目本身包含了一个选优过的`IP`列表，但是由于`WARP`的`IP`是动态的，所以可能会出现`IP`不可用的情况。若您需要手动选优，可以遵循以下步骤：
+项目本身包含了一个选优过的`IP`列表，但是由于`WARP`的`IP`是动态的，所以可能会出现`IP`不可用的
+情况。若您需要手动选优，可以遵循以下步骤：
 
 若您通过`docker-compose`部署，可以在项目目录下通过以下命令手动执行`IP`选优：
 
@@ -74,7 +77,8 @@ python3 app.py optimize
 
 ## 🔧 环境变量
 
-没错，您可以通过环境变量来配置该项目，在配置时，只需新建一个`.env.local`文件，写入您需要的环境变量即可。
+没错，您可以通过环境变量来配置该项目，在配置时，只需新建一个`.env.local`文件，写入您需要的环境
+变量即可。
 
 以下是可用的环境变量：
 
@@ -94,7 +98,8 @@ python3 app.py optimize
 
 ### 📝 配置示例
 
-例如，您设置`SECRET_KEY`为`123456`，并打算将订阅分享给社区，那么您的`.env.local`文件应该如下：
+例如，您设置`SECRET_KEY`为`123456`，并打算将订阅分享给社区，那么您的`.env.local`文件应该
+如下：
 
 ```env
 SECRET_KEY=123456
@@ -127,7 +132,8 @@ curl -X POST http://host:port/api/account/reset_key
 curl -X POST http://host:port/api/account/update_license -H "Content-Type: application/json" -d "{\"license_key\": \"your_license_key\"}"
 ```
 
-请注意，当您设置了`LicenseKey`后，其`PublicKey`和`PrivateKey`将会被重置，需要重新获取订阅内容。
+请注意，当您设置了`LicenseKey`后，其`PublicKey`和`PrivateKey`将会被重置，需要重新获取订阅
+内容。
 
 ## 🗂️ 引用项目
 
