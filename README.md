@@ -108,10 +108,10 @@ SHARE_SUBSCRIPTION=True
 
 ## 🧰 进阶操作
 
-**请注意，如果您设置了`SECRET_KEY`，需要在URL的末尾添加`secret_key`参数**，例如：
+**请注意，如果您设置了`SECRET_KEY`，需要在URL的末尾添加`key`参数**，例如：
 
 ```text
-http://your_IP:21001/some/api/actions?secret_key=your_secret_key
+http://your_IP:21001/some/api/actions?key=your_secret_key
 ```
 
 ### 重置账户的`PublicKey`和`PrivateKey`
