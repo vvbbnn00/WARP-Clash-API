@@ -25,7 +25,7 @@ from config import SECRET_KEY, REQUEST_RATE_LIMIT, SHARE_SUBSCRIPTION
 from services.account import resetAccountKey, doUpdateLicenseKey
 from services.common import getCurrentAccount
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
-    generateShadowRocketSubFile, generateSingBoxSubFile
+    generateShadowRocketSubFile, generateSingBoxSubFile, generateLoonSubFile
 
 RATE_LIMIT_MAP = {}
 
@@ -124,6 +124,8 @@ def attachEndpoints(app: Flask):
             return httpSubscription("surge")
         elif "sing-box" in user_agent:  # Sing Box
             return httpSubscription("sing-box")
+        elif "loon" in user_agent:  # Loon
+            return httpSubscription("loon")
 
         # By default, return Clash
         return httpSubscription("clash")
@@ -241,6 +243,14 @@ def attachEndpoints(app: Flask):
                                                random_name=random_name,
                                                ipv6=ipv6)
             file_name = f'SingBox-{fake.color_name()}.json'
+
+        elif sub_type == 'loon':  # Loon
+            file_data = generateLoonSubFile(account,
+                                            logger,
+                                            best=best,
+                                            random_name=random_name,
+                                            ipv6=ipv6)
+            file_name = f'Loon-{fake.color_name()}.conf'
 
         # This might be deprecated in the future.
         elif sub_type == "only_proxies":  # Only proxies
