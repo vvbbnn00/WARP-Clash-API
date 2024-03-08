@@ -142,6 +142,10 @@
     <div id="qrcode_sr"></div>
     <h2>Surge</h2>
     <textarea id="subSurgeScriptionLink" rows="3" readonly onclick="copyText('subSurgeScriptionLink')"></textarea>
+    <h2>Sing-Box</h2>
+    <textarea id="subSingBoxScriptionLink" rows="3" readonly onclick="copyText('subSingBoxScriptionLink')"></textarea>
+    <h2>Loon</h2>
+    <textarea id="subLoonScriptionLink" rows="3" readonly onclick="copyText('subLoonScriptionLink')"></textarea>
     <h2>Wireguard</h2>
     <textarea id="WireguardLink" rows="3" readonly onclick="copyText('WireguardLink')"></textarea>
     <div id="qrcode_wg"></div>
@@ -180,6 +184,8 @@
         document.getElementById('subscriptionLink').textContent = baseUrl + "api/clash?" + queryParams.toString();
         document.getElementById('subShadowRocketSubscriptionLink').textContent = baseUrl + "api/shadowrocket?" + queryParams.toString();
         document.getElementById('subSurgeScriptionLink').textContent = baseUrl + "api/surge?" + queryParams.toString();
+        document.getElementById('subSingBoxScriptionLink').textContent = baseUrl + "api/sing-box?" + queryParams.toString();
+        document.getElementById('subLoonScriptionLink').textContent = baseUrl + "api/loon?" + queryParams.toString();
         document.getElementById('WireguardLink').textContent = baseUrl + "api/wireguard?" + queryParams.toString();
         document.getElementById('AccountLink').href = baseUrl + "api/account?" + queryParams.toString();
 
