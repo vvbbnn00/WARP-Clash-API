@@ -34,15 +34,15 @@ from utils.entrypoints import getEntrypoints, getBestEntrypoints
 from utils.geoip import GeoIP
 from utils.node_name import NodeNameGenerator
 
-CF_CONFIG = yaml.load(open("./config/cf-config.json", "r", encoding="utf8"), Loader=yaml.FullLoader)
-CLASH = yaml.load(open("./config/clash.json", "r", encoding="utf8"), Loader=yaml.FullLoader)
+CF_CONFIG = yaml.safe_load(open("./config/cf-config.json", "r", encoding="utf8"))
+CLASH = yaml.safe_load(open("./config/clash.json", "r", encoding="utf8"))
 
 SURGE = configparser.ConfigParser()
 SURGE.read("./config/surge.conf", encoding="utf8")
 SURGE_RULE = open("./config/surge-rule.txt", "r", encoding="utf8").read()
 SURGE_SUB = open("./config/surge-sub.txt", "r", encoding="utf8").read()
 
-SING_BOX = yaml.load(open("./config/sing-box.json", "r", encoding="utf8"), Loader=yaml.FullLoader)
+SING_BOX = yaml.safe_load(open("./config/sing-box.json", "r", encoding="utf8"))
 
 GEOIP = GeoIP('./config/geolite/GeoLite2-Country.mmdb')
 
