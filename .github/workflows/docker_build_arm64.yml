@@ -1,4 +1,4 @@
-name: Docker Build and Push
+name: Docker Build and Push (linux/arm64)
 
 on:
   push:
@@ -30,18 +30,18 @@ jobs:
           tags: |
             type=sha,format=short
 
-      - name: Build and push
+      - name: Build and push (Dockerfile)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}-arm64
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: GITHUB_ACTIONS=true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
 
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
