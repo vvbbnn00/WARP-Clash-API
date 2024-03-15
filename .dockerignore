@@ -5,3 +5,5 @@ README.md
 LICENSE
 logs/*.log
 account/*.json
+.idea
+venv
