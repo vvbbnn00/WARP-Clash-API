@@ -30,7 +30,7 @@ jobs:
           tags: |
             type=sha,format=short
 
-      - name: Build and push
+      - name: Build and push (Dockerfile)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -42,6 +42,19 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: GITHUB_ACTIONS=true
           platforms: linux/amd64,linux/arm64
+
+      - name: Build and push (Dockerfile.armhf)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.armhf
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: GITHUB_ACTIONS=true
+          platforms: linux/arm/v7
 
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
