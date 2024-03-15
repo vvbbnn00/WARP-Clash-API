@@ -1,0 +1,25 @@
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt ./
+
+# Install Python, pip, necessary build dependencies,in one layer
+RUN apt-get update && \
+    apt-get install -y libffi-dev libssl-dev build-essential && \
+    printf "[global]\nextra-index-url=https://www.piwheels.org/simple\n" > /etc/pip.conf && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the rest of the code
+COPY . .
+RUN chmod +x ./scripts/*.sh
+
+# Set environment variables
+ENV RUN_IN_DOCKER=true
+
+CMD ["/bin/sh", "./scripts/run.sh"]
