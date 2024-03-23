@@ -15,25 +15,20 @@ endpointyx() {
     # 判断 warp 文件是否存在，不存在则下载
     if ! [ -f warp ]; then
       # 下载优选工具软件，感谢某匿名网友的分享的优选工具
-      wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-"$(archAffix)" -O warp || { echo "下载优选工具失败"; exit 1; }
+      wget https://gitlab.com/vvbbnn00/warp-script/-/raw/main/files/warp-yxip/warp-linux-"$(archAffix)" -O warp || { echo "下载优选工具失败"; exit 1; }
     fi
 
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
     ulimit -n 102400
 
     # 启动 WARP Endpoint IP 优选工具
-    chmod +x warp && ./warp >/dev/null 2>&1
+    chmod +x warp
 
-    # 读取 WARP Endpoint IP 优选工具生成的 Endpoint IP 段列表
-    process_result_csv() {
-        awk -F, '$3!="timeout ms" {print}' |
-        sort -t, -nk2 -nk3 |
-        uniq |
-        head -11
-    }
-
-    # 优选结果处理
-    process_result_csv < result.csv
+    if [ "$suffix" == "_v6" ]; then
+      ./warp -ipv6
+    else
+      ./warp
+    fi
 
     # 将优选结果移动到指定目录
     if [ -n "$RUN_IN_DOCKER" ]; then
@@ -43,56 +38,32 @@ endpointyx() {
     fi
 
     # 删除附属文件
-    rm -f ip.txt
+    rm -f ips-v4.txt ips-v6.txt
 }
 
-generate_random_ips() {
-    local iplist=100
-    local count=0
-    local ip_base=("162.159.192." "162.159.193." "162.159.195." "162.159.204." "188.114.96." "188.114.97." "188.114.98." "188.114.99.")
-
-    while [ $count -lt $iplist ]; do
-        for base in "${ip_base[@]}"; do
-            temp[$count]="${base}$(($RANDOM % 256))"
-            ((count++))
-            [ $count -ge $iplist ] && break
-        done
-    done
-
-    # 确保列表中的 IP 地址是唯一的
-    printf '%s\n' "${temp[@]}" | sort -u > ip.txt
+init_ipv4() {
+    echo "162.159.192.0/24
+162.159.193.0/24
+162.159.195.0/24
+162.159.204.0/24
+188.114.96.0/24
+188.114.97.0/24
+188.114.98.0/24
+188.114.99.0/24" > ips-v4.txt
 }
 
 endpoint4() {
-    generate_random_ips
+    init_ipv4
     endpointyx
 }
 
-generate_random_ipv6s() {
-    local iplist=100
-    local n=0
-    local temp
-
-    while [ $n -lt $iplist ]; do
-        local hex1 hex2 hex3 hex4
-        hex1=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
-        hex2=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
-        hex3=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
-        hex4=$(printf '%x\n' $((RANDOM * 2 + RANDOM % 2)))
-        temp[$n]="[2606:4700:d0::$hex1:$hex2:$hex3:$hex4]"
-        ((n++))
-        [ $n -ge $iplist ] && break
-
-        temp[$n]="[2606:4700:d1::$hex1:$hex2:$hex3:$hex4]"
-        ((n++))
-    done
-
-    # 确保列表中的 IP 地址是唯一的
-    printf '%s\n' "${temp[@]}" | sort -u > ip.txt
+init_ipv6() {
+    echo "2606:4700:d0::/48
+2606:4700:d1::/48" > ips-v6.txt
 }
 
 endpoint6() {
-    generate_random_ipv6s
+    init_ipv6
     endpointyx
 }
 
