@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  warp-clash:
+    build: .
+    ports:
+      - "21001:3000"
+    env_file:
+      - .env.local
+    volumes:
+      - ./config:/app/config
+      - ./account:/app/account
+      - ./logs:/app/logs
+    networks:
+      - default
+
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:db8:a::/64
+          gateway: 2001:db8:a::1

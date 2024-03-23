@@ -93,7 +93,7 @@ def reloadEntrypoints(ipv6=False):
             ip, port = row[0].split(':') if not ipv6 else (row[0].split("]:"))
             ip = ip.replace('[', '') if ipv6 else ip
             loss = float(row[1].replace('%', ''))
-            delay = int(row[2].replace('ms', ''))
+            delay = float(row[2].replace('ms', ''))
 
             if loss > LOSS_THRESHOLD or delay > DELAY_THRESHOLD:
                 continue

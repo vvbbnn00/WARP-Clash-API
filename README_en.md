@@ -25,20 +25,21 @@ your private high-speed `WARP+` node without extra hassle!
 ## 💡 Key Features
 
 - 💻 Supports clients such as `Clash`, `Surge`, `Shadowrocket`, etc.
-- 
+-
 - 🔑 Supports setting your own `LicenseKey`.
 - 🌏 Supports IP optimization.
 - 🐋 Supports one-click deployment using `Docker compose`.
-- 📕 Automatically replenishes `WARP+` traffic, requests are proxied, 
-preserving your IP from getting blocked.
+- 📕 Automatically replenishes `WARP+` traffic, requests are proxied,
+  preserving your IP from getting blocked.
 - ❓ Randomly selects nodes each subscription update, adding a sense of
-randomness to your experience.
+  randomness to your experience.
 
 ## 🚀 Quick Start
 
 ### 1. Install `Docker` and `Docker compose`
 
-- Docker Installation Guide: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+- Docker Installation
+  Guide: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 - Docker Compose Installation
   Guide: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
 
@@ -157,6 +158,43 @@ curl -X POST http://host:port/api/account/update_license -H "Content-Type: appli
 Please note that when you set the `LicenseKey`, your `PublicKey` and
 `PrivateKey` will be reset, and you will need to re-acquire the subscription
 content.
+
+### Using IPv6 Preference
+
+In principle, this service obtains IPv6 addresses by reading
+the `config/result_v6.csv` file. Therefore, you can run the IP preference
+function on a server that supports IPv6 to obtain IPv6 addresses. The list of
+obtained access addresses only needs to be written into
+the `config/result_v6.csv` file. Compared to running the IP preference function
+in a Docker container, this method is more straightforward.
+
+If you need to run the IP preference function in a Docker container, you can use
+the `docker-compose_ipv6.yaml` file to make the Docker image support IPv6.
+Before running, please ensure that your server supports IPv6 and add the
+following content to /etc/docker/daemon.json in the Docker service (remember to
+restart the Docker service):
+
+```json
+{
+  "experimental": true,
+  "ip6tables": true,
+  "ipv6": true,
+  "fixed-cidr-v6": "2001:db8:1::/64"
+}
+```
+
+If you have previously run the Docker service, please stop the previous service
+before running:
+
+```bash
+docker-compose down
+```
+
+Then, you can run the Docker service with the following command:
+
+```bash
+docker-compose -f docker-compose_ipv6.yaml up -d
+```
 
 ## 🗂️ Attribution
 

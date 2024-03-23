@@ -14,7 +14,8 @@
 
 该项目可以让你通过订阅的方式使用`WARP+`，支持`Clash`、`Shadowrocket`等客户端。项目内置了
 刷取`WARP+`流量的功能，可以让你的`WARP+`流量不再受限制（每`18`秒可获得`1GB`流量），同时，
-配备了`IP`选优功能。支持`Docker compose`一键部署，无需额外操作，即可享受你自己的`WARP+`私
+配备了`IP`选优功能。支持`Docker compose`
+一键部署，无需额外操作，即可享受你自己的`WARP+`私
 有高速节点！
 
 ## 💡 特色功能
@@ -30,8 +31,10 @@
 
 ### 1. 安装`Docker`和`Docker compose`
 
-- `Docker`安装教程：[https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
-- `Docker compose`安装教程：[https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
+- `Docker`
+  安装教程：[https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+- `Docker compose`
+  安装教程：[https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
 
 ### 2. 下载项目
 
@@ -64,7 +67,8 @@ docker-compose up -d
 
 ## 🌏 手动IP选优
 
-项目本身包含了一个选优过的`IP`列表，但是由于`WARP`的`IP`是动态的，所以可能会出现`IP`不可用的
+项目本身包含了一个选优过的`IP`列表，但是由于`WARP`的`IP`
+是动态的，所以可能会出现`IP`不可用的
 情况。若您需要手动选优，可以遵循以下步骤：
 
 若您通过`docker-compose`部署，可以在项目目录下通过以下命令手动执行`IP`选优：
@@ -102,7 +106,8 @@ python3 app.py optimize
 
 ### 📝 配置示例
 
-例如，您设置`SECRET_KEY`为`123456`，并打算将订阅分享给社区，那么您的`.env.local`文件应该
+例如，您设置`SECRET_KEY`为`123456`，并打算将订阅分享给社区，那么您的`.env.local`
+文件应该
 如下：
 
 ```env
@@ -138,6 +143,37 @@ curl -X POST http://host:port/api/account/update_license -H "Content-Type: appli
 
 请注意，当您设置了`LicenseKey`后，其`PublicKey`和`PrivateKey`将会被重置，需要重新获取订阅
 内容。
+
+### 使用 IPv6 优选
+
+从原理上来看，本服务通过读取`config/result_v6.csv`文件获取`IPv6`地址，因此您可以在支持
+`IPv6`的服务器上运行`IP`选优功能来获得`IPv6`地址。获取到的接入地址列表只需写入
+`config/result_v6.csv`文件中，相比在`Docker`容器中运行`IP`选优功能，此方法更为简便。
+
+如果您需要在`Docker`容器中运行`IP`选优功能，可以使用`docker-compose_ipv6.yaml`
+文件来让`Docker`镜像支持`IPv6`。在运行前，请确保您的服务器支持`IPv6`，并在`Docker`服务的
+`/etc/docker/daemon.json`中添加以下内容，并重启`Docker`服务：
+
+```json
+{
+  "experimental": true,
+  "ip6tables": true,
+  "ipv6": true,
+  "fixed-cidr-v6": "2001:db8:1::/64"
+}
+```
+
+若您在先前已经运行过`Docker`服务，在运行之前，请先停止之前的服务：
+
+```bash
+docker-compose down
+```
+
+然后，您可以通过以下命令来运行`Docker`服务：
+
+```bash
+docker-compose -f docker-compose_ipv6.yaml up -d
+```
 
 ## 🗂️ 引用项目
 
