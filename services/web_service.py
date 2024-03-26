@@ -26,7 +26,7 @@ from services.account import resetAccountKey, doUpdateLicenseKey
 from services.common import getCurrentAccount
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
     generateShadowRocketSubFile, generateSingBoxSubFile, generateLoonSubFile
-from utils.sub_useragent import get_sub_type_from_ua
+from utils.sub_useragent import getSubTypeFromUA
 
 RATE_LIMIT_MAP = {}
 
@@ -112,8 +112,7 @@ def attachEndpoints(app: Flask):
     @app.route('/sub', methods=['GET'])
     def httpAutoSub():
         user_agent = request.headers.get('User-Agent', 'unknown').lower()
-
-        sub_type = get_sub_type_from_ua(user_agent)
+        sub_type = getSubTypeFromUA(user_agent)
 
         # By default, return Clash
         return httpSubscription(sub_type)
@@ -190,7 +189,6 @@ def attachEndpoints(app: Flask):
         is_android = "android" in user_agent
 
         if sub_type == "clash":  # Clash
-
             file_data = generateClashSubFile(account,
                                              logger,
                                              best=best,
