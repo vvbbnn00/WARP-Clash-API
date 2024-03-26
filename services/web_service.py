@@ -26,6 +26,7 @@ from services.account import resetAccountKey, doUpdateLicenseKey
 from services.common import getCurrentAccount
 from services.subscription import generateClashSubFile, generateWireguardSubFile, generateSurgeSubFile, \
     generateShadowRocketSubFile, generateSingBoxSubFile, generateLoonSubFile
+from utils.sub_useragent import get_device_from_ua
 
 RATE_LIMIT_MAP = {}
 
@@ -111,24 +112,11 @@ def attachEndpoints(app: Flask):
     @app.route('/sub', methods=['GET'])
     def httpAutoSub():
         user_agent = request.headers.get('User-Agent', 'unknown').lower()
-        # Automatically detect subscription type by user agent
-        if "clash" in user_agent:  # Clash
-            return httpSubscription("clash")
-        elif "shadowrocket" in user_agent:  # Shadowrocket
-            return httpSubscription("shadowrocket")
-        elif "v2ray" in user_agent:  # V2Ray
-            return httpSubscription("shadowrocket")
-        elif "quantumult" in user_agent:  # Quantumult
-            return httpSubscription("clash")
-        elif "surge" in user_agent:  # Surge
-            return httpSubscription("surge")
-        elif "sing-box" in user_agent:  # Sing Box
-            return httpSubscription("sing-box")
-        elif "loon" in user_agent:  # Loon
-            return httpSubscription("loon")
+
+        sub_type = get_device_from_ua(user_agent)
 
         # By default, return Clash
-        return httpSubscription("clash")
+        return httpSubscription(sub_type)
 
     @app.route('/api/account', methods=['GET'])
     @rateLimit()
@@ -196,12 +184,12 @@ def attachEndpoints(app: Flask):
                                      f"expire=253388144714"
         }
 
-        if sub_type == "clash":  # Clash
+        # It seems that `dns` will cause problem in android.
+        # So it is necessary to check if the user agent contains "android".
+        # https://github.com/vvbbnn00/WARP-Clash-API/issues/74
+        is_android = "android" in user_agent
 
-            # It seems that `dns` will cause problem in android.
-            # So it is necessary to check if the user agent contains "android".
-            # https://github.com/vvbbnn00/WARP-Clash-API/issues/74
-            is_android = "android" in user_agent
+        if sub_type == "clash":  # Clash
 
             file_data = generateClashSubFile(account,
                                              logger,
@@ -209,6 +197,18 @@ def attachEndpoints(app: Flask):
                                              proxy_format=proxy_format,
                                              random_name=random_name,
                                              is_android=is_android,
+                                             is_meta=False,
+                                             ipv6=ipv6)
+            file_name = f'Clash-{fake.color_name()}.yaml'
+
+        elif sub_type == "meta":  # Meta
+            file_data = generateClashSubFile(account,
+                                             logger,
+                                             best=best,
+                                             proxy_format=proxy_format,
+                                             random_name=random_name,
+                                             is_android=is_android,
+                                             is_meta=True,
                                              ipv6=ipv6)
             file_name = f'Clash-{fake.color_name()}.yaml'
 
