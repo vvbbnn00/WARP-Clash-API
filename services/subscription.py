@@ -36,6 +36,7 @@ from utils.node_name import NodeNameGenerator
 
 CF_CONFIG = yaml.safe_load(open("./config/cf-config.json", "r", encoding="utf8"))
 CLASH = yaml.safe_load(open("./config/clash.json", "r", encoding="utf8"))
+CLASH_META = yaml.safe_load(open("./config/clash-meta.json", "r", encoding="utf8"))
 
 SURGE = configparser.ConfigParser()
 SURGE.read("./config/surge.conf", encoding="utf8")
@@ -80,6 +81,7 @@ def generateClashSubFile(account: Account = None,
                          proxy_format='full',
                          random_name=False,
                          is_android=False,
+                         is_meta=False,
                          ipv6=False):
     """
     Generate Clash subscription file
@@ -128,7 +130,10 @@ def generateClashSubFile(account: Account = None,
             config_data["dns"] = ['1.1.1.1', '1.0.0.1']
 
         user_config.append(config_data)
-    clash_json = copy.deepcopy(CLASH)
+    if is_meta:
+        clash_json = copy.deepcopy(CLASH_META)
+    else:
+        clash_json = copy.deepcopy(CLASH)
     clash_json["proxies"] = user_config
     for proxy_group in clash_json["proxy-groups"]:
         proxy_group["proxies"] += [proxy["name"] for proxy in user_config]
