@@ -1,0 +1,316 @@
+mixed-port: 7890
+socks-port: 7891
+allow-lan: false
+mode: Rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+cfw-bypass:
+  - localhost
+  - 127.*
+  - 10.*
+  - 172.16.*
+  - 172.17.*
+  - 172.18.*
+  - 172.19.*
+  - 172.20.*
+  - 172.21.*
+  - 172.22.*
+  - 172.23.*
+  - 172.24.*
+  - 172.25.*
+  - 172.26.*
+  - 172.27.*
+  - 172.28.*
+  - 172.29.*
+  - 172.30.*
+  - 172.31.*
+  - 192.168.*
+  - <local>
+dns:
+  enable: true
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - dns.msftncsi.com
+    - www.msftncsi.com
+    - www.msftconnecttest.com
+    - stun.*.*.*
+    - stun.*.*
+    - miwifi.com
+    - music.163.com
+    - '*.music.163.com'
+    - '*.126.net'
+    - api-jooxtt.sanook.com
+    - api.joox.com
+    - joox.com
+    - y.qq.com
+    - '*.y.qq.com'
+    - streamoc.music.tc.qq.com
+    - mobileoc.music.tc.qq.com
+    - isure.stream.qqmusic.qq.com
+    - dl.stream.qqmusic.qq.com
+    - aqqmusic.tc.qq.com
+    - amobile.music.tc.qq.com
+    - '*.xiami.com'
+    - '*.music.migu.cn'
+    - music.migu.cn
+    - netis.cc
+    - router.asus.com
+    - repeater.asus.com
+    - routerlogin.com
+    - routerlogin.net
+    - tendawifi.com
+    - tendawifi.net
+    - tplinklogin.net
+    - tplinkwifi.net
+    - tplinkrepeater.net
+    - '*.ntp.org.cn'
+    - '*.openwrt.pool.ntp.org'
+    - '*.msftconnecttest.com'
+    - '*.msftncsi.com'
+    - localhost.ptlogin2.qq.com
+    - '*.*.*.srv.nintendo.net'
+    - '*.*.stun.playstation.net'
+    - xbox.*.*.microsoft.com
+    - '*.ipv6.microsoft.com'
+    - '*.*.xboxlive.com'
+    - speedtest.cros.wr.pvp.net
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - 'tls://223.5.5.5:853'
+    - 'https://223.6.6.6/dns-query'
+    - 'https://120.53.53.53/dns-query'
+  fallback:
+    - 'tls://101.101.101.101:853'
+    - 'https://101.101.101.101/dns-query'
+    - 'https://public.dns.iij.jp/dns-query'
+    - 'https://208.67.220.220/dns-query'
+  fallback-filter:
+    geoip: true
+    ipcidr:
+      - 240.0.0.0/4
+      - 0.0.0.0/32
+      - 127.0.0.1/32
+    domain:
+      - +.google.com
+      - +.facebook.com
+      - +.twitter.com
+      - +.youtube.com
+      - +.xn--ngstr-lra8j.com
+      - +.google.cn
+      - +.googleapis.cn
+      - +.googleapis.com
+      - +.gvt1.com
+      - +.paoluz.com
+      - +.paoluz.link
+      - +.paoluz.xyz
+      - +.sodacity-funk.xyz
+      - +.nloli.xyz
+      - +.jsdelivr.net
+      - +.proton.me
+proxies: [ ]
+proxy-groups:
+  - name: "🌐 节点选择"
+    type: select
+    proxies:
+      - "💡 自动选择"
+  - name: "💡 自动选择"
+    type: url-test
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
+    proxies: [ ]
+
+  - name: "广告域名"
+    type: select
+    proxies:
+      - "REJECT"
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "iCloud"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "Apple"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "代理域名"
+    type: select
+    proxies:
+      - "🌐 节点选择"
+      - "💡 自动选择"
+      - "🌍 全球直连"
+
+  - name: "直连域名"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "私有网络域名"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "GFWList 域名"
+    type: select
+    proxies:
+      - "🌐 节点选择"
+      - "💡 自动选择"
+      - "🌍 全球直连"
+
+  - name: "国外域名"
+    type: select
+    proxies:
+      - "🌐 节点选择"
+      - "💡 自动选择"
+      - "🌍 全球直连"
+
+  - name: "Telegram"
+    type: select
+    proxies:
+      - "🌐 节点选择"
+      - "💡 自动选择"
+      - "🌍 全球直连"
+
+  - name: "中国大陆 IP"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "局域网 IP"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "例外应用"
+    type: select
+    proxies:
+      - "🌍 全球直连"
+      - "🌐 节点选择"
+      - "💡 自动选择"
+
+  - name: "🌍 全球直连"
+    type: select
+    proxies:
+      - DIRECT
+
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+
+  icloud:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+
+  apple:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  direct:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+
+  private:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: ./ruleset/private.yaml
+    interval: 86400
+
+  gfw:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+
+  tld-not-cn:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
+    path: ./ruleset/tld-not-cn.yaml
+    interval: 86400
+
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+
+  applications:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
+    path: ./ruleset/applications.yaml
+    interval: 86400
+
+rules:
+  - RULE-SET,applications,例外应用
+  - RULE-SET,private,私有网络域名
+  - RULE-SET,reject,广告域名
+  - RULE-SET,icloud,iCloud
+  - RULE-SET,apple,Apple
+  - RULE-SET,proxy,代理域名
+  - RULE-SET,direct,直连域名
+  - RULE-SET,lancidr,局域网 IP
+  - RULE-SET,cncidr,中国大陆 IP
+  - RULE-SET,telegramcidr,Telegram
+  - GEOIP,LAN,🌍 全球直连
+  - GEOIP,CN,🌍 全球直连
+  - MATCH,🌐 节点选择

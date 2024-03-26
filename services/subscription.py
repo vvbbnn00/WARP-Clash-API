@@ -35,8 +35,8 @@ from utils.geoip import GeoIP
 from utils.node_name import NodeNameGenerator
 
 CF_CONFIG = yaml.safe_load(open("./config/cf-config.json", "r", encoding="utf8"))
-CLASH = yaml.safe_load(open("./config/clash.json", "r", encoding="utf8"))
-CLASH_META = yaml.safe_load(open("./config/clash-meta.json", "r", encoding="utf8"))
+CLASH = yaml.safe_load(open("./config/clash.yaml", "r", encoding="utf8"))
+CLASH_META = yaml.safe_load(open("./config/clash-meta.yaml", "r", encoding="utf8"))
 
 SURGE = configparser.ConfigParser()
 SURGE.read("./config/surge.conf", encoding="utf8")
