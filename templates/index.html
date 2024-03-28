@@ -168,7 +168,10 @@
         const randomName = document.getElementById('randomName').checked;
         const proxyFormat = document.getElementById('proxyFormat').value;
         const ipv6 = document.getElementById('ipv6').checked;
-        const baseUrl = location.protocol + '//' + location.host + '/';
+        // Get the directory part of location.pathname
+        const basePath = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+        // Construct the baseUrl
+        const baseUrl = location.origin + basePath;
         const queryParams = new URLSearchParams({
             best,
             randomName,
