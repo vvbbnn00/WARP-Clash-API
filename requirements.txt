@@ -4,5 +4,5 @@ Faker==24.3.0
 flask==3.0.2
 PyYAML~=6.0.1
 APScheduler~=3.10.4
-gunicorn==21.2.0
+gunicorn==22.0.0
 maxminddb==2.6.0
