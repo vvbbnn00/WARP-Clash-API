@@ -4,7 +4,7 @@
   "allow-lan": false,
   "unified-delay": true,
   "keep-alive-interval": 300,
-  "mode": "Rule",
+  "mode": "rule",
   "log-level": "info",
   "external-controller": "127.0.0.1:9090",
   "dns": {
