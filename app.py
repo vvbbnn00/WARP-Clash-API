@@ -61,7 +61,7 @@ def main():
     :return:
     """
     parser = argparse.ArgumentParser(description="WARP Clash API")
-    parser.add_argument("command", choices=["web", "background", "optimize"], help="Command to run")
+    parser.add_argument("command", choices=["web", "background", "optimize"], help="Command to run", default="web", nargs='?')
 
     args = parser.parse_args()
 

@@ -6,3 +6,4 @@ venv
 *.local
 logs/*.log
 __pycache__
+.vercel

@@ -17,9 +17,10 @@ along with this program; if not, see <https://www.gnu.org/licenses>.
 import datetime
 import json
 import logging
+import os
+import tempfile
 
-ACCOUNT_PATH = "account/account.json"
-
+ACCOUNT_PATH = os.path.join(tempfile.gettempdir(), 'account.json')
 
 class Account:
     account_id: str = ""
