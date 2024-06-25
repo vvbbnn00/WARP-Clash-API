@@ -226,6 +226,8 @@ def generateSurgeSubFile(account: Account = None,
         user_config.append(
             {
                 "self-ip": "172.16.0.2",
+                "self-ip-v6": "2606:4700:110:8da6:4096:d428:f1b0:9380"
+                "prefer-ipv6": true
                 "private-key": account.private_key,
                 "dns-server": "1.1.1.1",
                 "mtu": 1420,
